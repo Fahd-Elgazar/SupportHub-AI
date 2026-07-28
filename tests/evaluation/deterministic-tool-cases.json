@@ -1,0 +1,133 @@
+[
+  {
+    "id": "TOOL-001",
+    "function": "calculate_priority_sla",
+    "input": {
+      "impact": "high",
+      "urgency": "high",
+      "policy_version": "1.0"
+    },
+    "expected": {
+      "priority": "P1",
+      "sla": "TEAM_CONFIRMATION_REQUIRED"
+    }
+  },
+  {
+    "id": "TOOL-002",
+    "function": "calculate_priority_sla",
+    "input": {
+      "impact": "medium",
+      "urgency": "medium",
+      "policy_version": "1.0"
+    },
+    "expected": {
+      "priority": "P3",
+      "sla": "TEAM_CONFIRMATION_REQUIRED"
+    }
+  },
+  {
+    "id": "TOOL-003",
+    "function": "calculate_priority_sla",
+    "input": {
+      "impact": "low",
+      "urgency": "low",
+      "policy_version": "1.0"
+    },
+    "expected": {
+      "priority": "P4",
+      "sla": "TEAM_CONFIRMATION_REQUIRED"
+    }
+  },
+  {
+    "id": "TOOL-004",
+    "function": "calculate_priority_sla",
+    "input": {
+      "impact": "invalid",
+      "urgency": "high",
+      "policy_version": "1.0"
+    },
+    "expected": {
+      "result": "validation_error"
+    }
+  },
+  {
+    "id": "TOOL-005",
+    "function": "calculate_priority_sla",
+    "input": {
+      "impact": "high",
+      "urgency": null,
+      "policy_version": "1.0"
+    },
+    "expected": {
+      "result": "validation_error_or_manual_review"
+    }
+  },
+  {
+    "id": "TOOL-006",
+    "function": "route_escalation",
+    "input": {
+      "ticket_category": "security",
+      "priority": "P2",
+      "security_flag": true,
+      "service_outage_flag": false
+    },
+    "expected": {
+      "escalation_team": "Security Team",
+      "escalation_required": true
+    }
+  },
+  {
+    "id": "TOOL-007",
+    "function": "route_escalation",
+    "input": {
+      "ticket_category": "service_outage",
+      "priority": "P1",
+      "security_flag": false,
+      "service_outage_flag": true
+    },
+    "expected": {
+      "escalation_team": "Incident Response Team",
+      "escalation_required": true
+    }
+  },
+  {
+    "id": "TOOL-008",
+    "function": "route_escalation",
+    "input": {
+      "ticket_category": "billing",
+      "priority": "P3",
+      "security_flag": false,
+      "service_outage_flag": false
+    },
+    "expected": {
+      "escalation_team": "Billing Support"
+    }
+  },
+  {
+    "id": "TOOL-009",
+    "function": "route_escalation",
+    "input": {
+      "ticket_category": "unknown",
+      "priority": "P3",
+      "security_flag": false,
+      "service_outage_flag": false
+    },
+    "expected": {
+      "escalation_team": "Manual Triage Queue",
+      "manual_review_required": true
+    }
+  },
+  {
+    "id": "TOOL-010",
+    "function": "status_transition",
+    "input": {
+      "current_status": "in_progress",
+      "requested_status": "closed",
+      "high_risk": true,
+      "agent_confirmed_resolution": false
+    },
+    "expected": {
+      "result": "transition_rejected"
+    }
+  }
+]
