@@ -1,210 +1,176 @@
-# Data and Interface Contracts
+# SupportHub AI API Contracts
 
-## Purpose
+## Base path
 
-Defines the interfaces between the AI module, deterministic application logic,
-knowledge services, and ticket management components.
+```text
+/api/supporthub-ai
+```
 
-These contracts ensure every component exchanges data using
-consistent field names, validation rules, and ownership.
-## Design Principles
+## 1. Generate support response
 
-All contracts should:
+### Request
 
-- use shared field names
-- validate inputs before processing
-- reject unknown enum values
-- preserve auditability
-- remain backward compatible where practical
-## Contract Version
+```http
+POST /api/supporthub-ai
+Content-Type: application/json
+```
 
-Version: 1.0
+```json
+{
+  "question": "I cannot log in to my account."
+}
+```
 
-Future breaking changes should create a new contract version and update all dependent documentation.
+### Success response — 200
 
-## 1. Knowledge Search Request
+```json
+{
+  "success": true,
+  "data": {
+    "question": "I cannot log in to my account.",
+    "answer": "...",
+    "source": ["Internal Knowledge Base"],
+    "ticket_category": "Account",
+    "impact": "Low",
+    "urgency": "Low",
+    "priority": "P4",
+    "sla": "48 Hours",
+    "escalation_team": "Account Support Team",
+    "suggested_reply": "...",
+    "status": "Open"
+  }
+}
+```
 
-| Field | Type | Required | Owner |
-|---|---|---:|---|
-| request_id | string | Yes | Application |
-| question | string | Yes | User |
-| locale | string | No | Application |
-| allowed_source_ids | array or null | No | Application |
+The AI-generated text and classification can vary, but the response shape and allowed values must remain valid.
 
-### Validation Rules
+### Validation error — 400
 
-- `question` must not be empty or whitespace-only.
-- The question must respect the approved maximum length.
-- User text cannot expand the approved source scope.
-- Secrets and unnecessary personal information should not be included.
+```json
+{
+  "success": false,
+  "message": "Validation failed.",
+  "errors": [
+    {
+      "field": "question",
+      "message": "Question is required."
+    }
+  ]
+}
+```
 
----
+## 2. Submit feedback
 
-## 2. Knowledge Search Response
+### Request
 
-| Field | Type | Required |
-|---|---|---:|
-| request_id | string | Yes |
-| result_status | enum | Yes |
-| answer | string or null | Yes |
-| citations | array | Yes |
-| requires_human_review | boolean | Yes |
-| limitations | array | Yes |
+```http
+POST /api/supporthub-ai/feedback
+Content-Type: application/json
+```
 
-### Allowed Result Status
+```json
+{
+  "question": "Login issue",
+  "answer": "Reset your password.",
+  "rating": 5,
+  "comment": "Helpful response"
+}
+```
 
-- `grounded`
-- `partial`
-- `not_found`
-- `conflicting_sources`
-- `error`
+### Success response — 201
 
-### Rules
+```json
+{
+  "success": true,
+  "message": "Feedback submitted successfully.",
+  "data": {
+    "id": "...",
+    "question": "Login issue",
+    "answer": "Reset your password.",
+    "rating": 5,
+    "comment": "Helpful response",
+    "createdAt": "..."
+  }
+}
+```
 
-- A grounded answer requires at least one approved citation.
-- A not-found response must not contain an invented answer.
-- Conflicting sources require deterministic resolution or human review.
+## 3. Health check
 
----
+```http
+GET /api/supporthub-ai/health
+```
 
-## 3. AI Triage Proposal
+### Success response — 200
 
-| Field | Type | Required |
-|---|---|---:|
-| proposed_ticket_category | enum | Yes |
-| proposed_impact | enum | Yes |
-| proposed_urgency | enum | Yes |
-| rationale | string | Yes |
-| evidence_spans | array | No |
-| uncertainty_flags | array | Yes |
+```json
+{
+  "success": true,
+  "status": "healthy",
+  "timestamp": "..."
+}
+```
 
-This contract represents an AI proposal only.
+## 4. Version information
 
-The AI must not authoritatively assign:
+```http
+GET /api/supporthub-ai/version
+```
 
-- priority
-- SLA
-- escalation team
-- final status
+### Success response — 200
 
----
+```json
+{
+  "success": true,
+  "api_version": "1.0.0",
+  "prompt_version": "v1",
+  "provider": "groq"
+}
+```
 
-## 4. Priority and SLA Input
+The provider value depends on environment configuration.
 
-| Field | Type | Required |
-|---|---|---:|
-| impact | enum | Yes |
-| urgency | enum | Yes |
-| policy_version | string | Yes |
-| calculated_at | datetime | Yes |
+## 5. Validate request only
 
-## 5. Priority and SLA Result
+```http
+POST /api/supporthub-ai/validate
+Content-Type: application/json
+```
 
-| Field | Type | Required |
-|---|---|---:|
-| priority | enum | Yes |
-| sla_policy_id | string | Yes |
-| first_response_due_at | datetime or null | No |
-| resolution_due_at | datetime or null | No |
-| calculation_reason_code | string | Yes |
-| manual_review_required | boolean | Yes |
+```json
+{
+  "question": "Please validate this support request."
+}
+```
 
-### Deterministic Requirements
+### Success response — 200
 
-- The same validated input and policy version must produce the same result.
-- Unknown values must not be silently accepted.
-- Missing matrix combinations require manual review.
-- AI text cannot override the result.
+```json
+{
+  "success": true,
+  "message": "Request is valid."
+}
+```
 
----
+## 6. Unknown route
 
-## 6. Escalation Input
+### Response — 404
 
-| Field | Type | Required |
-|---|---|---:|
-| ticket_category | enum | Yes |
-| priority | enum | Yes |
-| security_flag | boolean | Yes |
-| service_outage_flag | boolean | Yes |
-| policy_version | string | Yes |
+```json
+{
+  "success": false,
+  "message": "Route not found."
+}
+```
 
-## 7. Escalation Result
+## Error behavior
 
-| Field | Type | Required |
-|---|---|---:|
-| escalation_team | enum | Yes |
-| route_reason_code | string | Yes |
-| escalation_required | boolean | Yes |
-| manual_review_required | boolean | Yes |
+Unhandled errors return:
 
-### Recommended Precedence
+```json
+{
+  "success": false,
+  "message": "Internal server error."
+}
+```
 
-1. Security override
-2. Critical outage override
-3. Other high-risk override
-4. Category and priority routing
-5. Manual-review fallback
-
-This order requires team approval.
-
----
-
-## 8. Final Ticket Record
-
-Required product fields:
-
-- question
-- answer
-- source
-- ticket_category
-- impact
-- urgency
-- priority
-- sla
-- escalation_team
-- suggested_reply
-- status
-
-Recommended provenance fields:
-
-- ticket_id
-- citations
-- knowledge_result_status
-- requires_human_review
-- knowledge_version
-- taxonomy_version
-- priority_policy_version
-- routing_policy_version
-- prompt_version
-- model_version
-- created_at
-- updated_at
-- decision_log
-
----
-
-## 9. Feedback Contract
-
-| Field | Type | Required |
-|---|---|---:|
-| feedback_id | string | Yes |
-| ticket_id | string | Yes |
-| actor_type | enum | Yes |
-| rating | enum | Yes |
-| reason_codes | array | No |
-| corrected_answer | string or null | No |
-| corrected_category | enum or null | No |
-| correction_notes | string or null | No |
-| created_at | datetime | Yes |
-
-Feedback must create a review candidate. It must not automatically update approved knowledge.
- # Contract Evolution
-
-Any changes to these interfaces should be reviewed by the project team.
-
-Breaking changes should:
-
-- update shared data fields
-- update deterministic tool rules
-- update evaluation cases
-- update documentation
+In non-production mode, the backend may expose the underlying error message instead.
