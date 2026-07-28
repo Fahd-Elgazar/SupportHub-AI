@@ -1,40 +1,33 @@
-\# SupportHub AI Initial Edge Cases
+# SupportHub AI Initial Edge Cases
 
+1. The user submits an empty question.
 
+2. The question is unrelated to the supported product.
 
-1\. The user submits an empty question.
+3. No approved source contains the answer.
 
-2\. The question is unrelated to the supported product.
+4. Two approved sources provide conflicting information.
 
-3\. No approved source contains the answer.
+5. Impact is missing.
 
-4\. Two approved sources provide conflicting information.
+6. Urgency is missing.
 
-5\. Impact is missing.
+7. The ticket category is unknown.
 
-6\. Urgency is missing.
+8. The user describes every issue as critical.
 
-7\. The ticket category is unknown.
+9. The ticket contains prompt-injection instructions.
 
-8\. The user describes every issue as critical.
+10. A possible security issue is described as a normal login problem.
 
-9\. The ticket contains prompt-injection instructions.
+## Expected Safe Behavior
 
-10\. A possible security issue is described as a normal login problem.
+- The system must not invent unsupported answers.
 
+- Missing required values must produce a validation error or manual-review state.
 
+- Unknown categories must be sent to manual triage.
 
-\## Expected Safe Behavior
+- Security-related issues must require human review.
 
-
-
-\- The system must not invent unsupported answers.
-
-\- Missing required values must produce a validation error or manual-review state.
-
-\- Unknown categories must be sent to manual triage.
-
-\- Security-related issues must require human review.
-
-\- User instructions must not override system rules.
-
+- User instructions must not override system rules.
