@@ -1,30 +1,26 @@
-# SupportHub AI Source Register
+# Approved Source Register
 
-## Purpose
-
-This document records the approved sources that SupportHub AI is allowed to use.
-
-The system must not answer product-support questions using unapproved sources.
-
-## Initial Approved Corpus
-
-| Source ID | Source Name | Source Type | Location | Owner | Approval Status | Intended Use |
+| Source ID | Document | Owner | Version | Status | Authority | Review Date |
 |---|---|---|---|---|---|---|
-| SRC-001 | Product FAQ | FAQ | To be confirmed | Team 09 | Pending | Answer common product questions |
-| SRC-002 | Troubleshooting Guide | Troubleshooting Guide | To be confirmed | Team 09 | Pending | Provide approved troubleshooting steps |
-| SRC-003 | Support Policy | Policy | To be confirmed | Team 09 | Pending | Define support rules, SLA, and escalation behavior |
-| SRC-004 | Sample Tickets | Test Data | To be confirmed | Team 09 | Pending | Test ticket classification, priority, SLA, routing, and failure behavior |
+| KB-FAQ-001 | product-faq.md | Knowledge Owner | 1.0 | Approved | Standard | TBD |
+| KB-TS-001 | troubleshooting-guide.md | Knowledge Owner | 1.0 | Approved | Standard | TBD |
+| KB-POL-001 | support-policy.md | Product Owner | 1.0 | Approved | Highest | TBD |
 
-## Source Rules
+## Source Status Values
 
-1. Only approved sources may be used for grounded answers.
+- Draft
+- Under Review
+- Approved
+- Published
+- Superseded
+- Retired
 
-2. Every generated answer must identify its supporting source.
+## Rules
 
-3. Unsupported questions must not receive fabricated answers.
-
-4. New sources require review before being added.
-
-5. Draft or unapproved sources must not be treated as authoritative.
-
-6. Conflicting information must be escalated for review.
+1. Only approved or published sources may be retrieved.
+2. The support policy has higher authority than other sources.
+3. Retired and superseded content must not appear in new answers.
+4. Every answer must reference the source ID and document.
+5. Conflicting sources require authority and version checking.
+6. Files must not be silently changed after publication.
+7. Every approved source must have an owner and review date.
