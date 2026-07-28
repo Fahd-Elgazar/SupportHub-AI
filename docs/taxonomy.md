@@ -1,146 +1,78 @@
-# SupportHub AI Ticket Taxonomy
+# SupportHub AI Taxonomy
 
 ## Purpose
 
-This document defines the approved taxonomy used to classify support tickets within SupportHub AI. It provides the allowed categories, impact and urgency levels, ticket statuses, and validation rules used throughout the application.
+This document defines the exact values currently accepted and returned by the SupportHub AI backend. Values are case-sensitive because the response schema validates them exactly.
 
-The AI may propose values from this taxonomy, but every proposed value must be validated before it is accepted by the application.
+## Ticket categories
 
----
+| Value | Meaning |
+|---|---|
+| `Technical` | Technical, server, database, or system issues |
+| `Billing` | Billing, invoice, payment, or subscription issues |
+| `Account` | Login, password, account, or authentication issues |
+| `General` | Requests that do not match another category |
+| `Bug` | Reported software defects |
+| `Feature Request` | Requests for new or changed functionality |
 
-# Ticket Categories
+## Impact
 
-Only the following ticket categories are valid.
+Allowed values:
 
-| Category ID | Description | Examples | Exclusions |
-|-------------|-------------|----------|------------|
-| account_access | Login, password, authentication, or account access issues | Password reset, locked account, MFA problems | Security compromise or suspected account takeover |
-| technical_issue | Product malfunction or unexpected system behavior | Application crash, upload failure, API error | Platform-wide outage |
-| billing | Payment, invoices, subscriptions, refunds, or licensing | Missing invoice, payment failed, subscription renewal | General product usage questions |
-| product_question | Questions about approved product functionality or configuration | Feature usage, account settings | Future roadmap requests or unsupported features |
-| security | Security incidents or suspected compromise | Stolen credentials, suspicious login, exposed data | Routine password reset |
-| service_outage | Platform-wide service interruption | Multiple users unable to access the service | Single-user technical issue |
-| other | Valid request that cannot be classified using an approved category | Uncategorized support request | Empty or invalid input |
+- `Low`
+- `Medium`
+- `High`
 
----
+## Urgency
 
-# Impact Levels
+Allowed values:
 
-Impact measures **how many users or business processes are affected**.
+- `Low`
+- `Medium`
+- `High`
 
-| Value | Definition |
-|--------|------------|
-| low | One user or a minor inconvenience |
-| medium | Multiple users or a significant workflow disruption |
-| high | Organization-wide impact, major service disruption, or security incident |
+## Priority
 
----
+Allowed values:
 
-# Urgency Levels
+- `P1`
+- `P2`
+- `P3`
+- `P4`
 
-Urgency measures **how quickly action is required**.
+Priority is calculated deterministically from impact and urgency.
 
-| Value | Definition |
-|--------|------------|
-| low | Resolution can reasonably wait |
-| medium | Timely action is required |
-| high | Immediate action is required to reduce business impact |
+## Status
 
----
+Allowed response values:
 
-# Priority
+- `Open`
+- `Pending`
+- `Escalated`
+- `Resolved`
 
-Priority is **not classified by the AI**.
+The current AI prompt instructs the model to return `Open`. The response schema accepts all four values.
 
-Priority is calculated deterministically using:
+## Normalization behavior
 
-- Impact
-- Urgency
-- Approved priority matrix
-- Current policy version
+The service normalizes model output before validation:
 
-Allowed priority values:
+- login, password, account, or authentication terms become `Account`
+- billing, invoice, or payment terms become `Billing`
+- bug terms become `Bug`
+- feature terms become `Feature Request`
+- technical, server, database, or system terms become `Technical`
+- unmatched values become `General`
 
-- P1 — Critical
-- P2 — High
-- P3 — Medium
-- P4 — Low
+Impact and urgency are normalized to `High`, `Medium`, or `Low`. Unrecognized values fall back to `Low`.
 
----
+## Governance
 
-# Ticket Status
+Any change to these values must be applied consistently to:
 
-Only the following ticket states are valid.
-
-| Status | Description |
-|---------|-------------|
-| new | Ticket has been created but not reviewed |
-| triaged | Initial classification has been completed |
-| waiting_for_agent | Awaiting assignment or agent action |
-| in_progress | Agent is actively working on the ticket |
-| waiting_for_customer | Additional customer information is required |
-| resolved | Proposed solution has been provided |
-| closed | Resolution has been confirmed and ticket is complete |
-| manual_review | Human review is required before further processing |
-
----
-
-# Classification Rules
-
-The AI may propose:
-
-- ticket_category
-- impact
-- urgency
-
-The application is responsible for:
-
-- validating proposed values
-- calculating priority
-- calculating SLA
-- determining escalation
-- controlling ticket status transitions
-
----
-
-# Validation Rules
-
-The application must enforce the following rules:
-
-1. Only values defined in this document are valid.
-2. Category names are case-sensitive.
-3. Unknown category values must not be guessed.
-4. Invalid impact values must produce a validation error.
-5. Invalid urgency values must produce a validation error.
-6. Empty category values require manual review.
-7. AI-generated values outside this taxonomy must be rejected.
-
----
-
-# Unknown Value Behavior
-
-| Situation | Expected Behavior |
-|-----------|-------------------|
-| Unknown category | Route to manual review |
-| Unknown impact | Validation error |
-| Unknown urgency | Validation error |
-| Unknown status | Reject status transition |
-| Unknown priority | Reject deterministic calculation |
-
----
-
-# Future Extensions
-
-Additional ticket categories should only be introduced after approval by the project team.
-
-New categories must include:
-
-- Category ID
-- Description
-- Examples
-- Exclusions
-- Updated routing rules
-- Updated evaluation cases
-- Updated deterministic tests
-
-No undocumented category should be used in production.
+- `config/prompts.js`
+- `services/supportHub.service.js`
+- `schemas/supportResponse.schema.js`
+- deterministic evaluation cases
+- API evaluation cases
+- this taxonomy document
