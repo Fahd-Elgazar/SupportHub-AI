@@ -1,133 +1,294 @@
-[
-  {
-    "id": "TOOL-001",
-    "function": "calculate_priority_sla",
-    "input": {
-      "impact": "high",
-      "urgency": "high",
-      "policy_version": "1.0"
+{
+  "schema_version": "1.0",
+  "description": "Deterministic evaluation cases for SupportHub AI business rules.",
+  "tests": [
+    {
+      "id": "TOOL-001",
+      "function": "calculate_priority_sla",
+      "input": {
+        "impact": "high",
+        "urgency": "high",
+        "policy_version": "1.0"
+      },
+      "expected": {
+        "priority": "P1",
+        "sla": "TEAM_CONFIRMATION_REQUIRED"
+      }
     },
-    "expected": {
-      "priority": "P1",
-      "sla": "TEAM_CONFIRMATION_REQUIRED"
-    }
-  },
-  {
-    "id": "TOOL-002",
-    "function": "calculate_priority_sla",
-    "input": {
-      "impact": "medium",
-      "urgency": "medium",
-      "policy_version": "1.0"
+    {
+      "id": "TOOL-002",
+      "function": "calculate_priority_sla",
+      "input": {
+        "impact": "high",
+        "urgency": "medium",
+        "policy_version": "1.0"
+      },
+      "expected": {
+        "priority": "P2",
+        "sla": "TEAM_CONFIRMATION_REQUIRED"
+      }
     },
-    "expected": {
-      "priority": "P3",
-      "sla": "TEAM_CONFIRMATION_REQUIRED"
-    }
-  },
-  {
-    "id": "TOOL-003",
-    "function": "calculate_priority_sla",
-    "input": {
-      "impact": "low",
-      "urgency": "low",
-      "policy_version": "1.0"
+    {
+      "id": "TOOL-003",
+      "function": "calculate_priority_sla",
+      "input": {
+        "impact": "high",
+        "urgency": "low",
+        "policy_version": "1.0"
+      },
+      "expected": {
+        "priority": "P2",
+        "sla": "TEAM_CONFIRMATION_REQUIRED"
+      }
     },
-    "expected": {
-      "priority": "P4",
-      "sla": "TEAM_CONFIRMATION_REQUIRED"
-    }
-  },
-  {
-    "id": "TOOL-004",
-    "function": "calculate_priority_sla",
-    "input": {
-      "impact": "invalid",
-      "urgency": "high",
-      "policy_version": "1.0"
+    {
+      "id": "TOOL-004",
+      "function": "calculate_priority_sla",
+      "input": {
+        "impact": "medium",
+        "urgency": "high",
+        "policy_version": "1.0"
+      },
+      "expected": {
+        "priority": "P2",
+        "sla": "TEAM_CONFIRMATION_REQUIRED"
+      }
     },
-    "expected": {
-      "result": "validation_error"
-    }
-  },
-  {
-    "id": "TOOL-005",
-    "function": "calculate_priority_sla",
-    "input": {
-      "impact": "high",
-      "urgency": null,
-      "policy_version": "1.0"
+    {
+      "id": "TOOL-005",
+      "function": "calculate_priority_sla",
+      "input": {
+        "impact": "medium",
+        "urgency": "medium",
+        "policy_version": "1.0"
+      },
+      "expected": {
+        "priority": "P3",
+        "sla": "TEAM_CONFIRMATION_REQUIRED"
+      }
     },
-    "expected": {
-      "result": "validation_error_or_manual_review"
-    }
-  },
-  {
-    "id": "TOOL-006",
-    "function": "route_escalation",
-    "input": {
-      "ticket_category": "security",
-      "priority": "P2",
-      "security_flag": true,
-      "service_outage_flag": false
+    {
+      "id": "TOOL-006",
+      "function": "calculate_priority_sla",
+      "input": {
+        "impact": "medium",
+        "urgency": "low",
+        "policy_version": "1.0"
+      },
+      "expected": {
+        "priority": "P3",
+        "sla": "TEAM_CONFIRMATION_REQUIRED"
+      }
     },
-    "expected": {
-      "escalation_team": "Security Team",
-      "escalation_required": true
-    }
-  },
-  {
-    "id": "TOOL-007",
-    "function": "route_escalation",
-    "input": {
-      "ticket_category": "service_outage",
-      "priority": "P1",
-      "security_flag": false,
-      "service_outage_flag": true
+    {
+      "id": "TOOL-007",
+      "function": "calculate_priority_sla",
+      "input": {
+        "impact": "low",
+        "urgency": "high",
+        "policy_version": "1.0"
+      },
+      "expected": {
+        "priority": "P3",
+        "sla": "TEAM_CONFIRMATION_REQUIRED"
+      }
     },
-    "expected": {
-      "escalation_team": "Incident Response Team",
-      "escalation_required": true
-    }
-  },
-  {
-    "id": "TOOL-008",
-    "function": "route_escalation",
-    "input": {
-      "ticket_category": "billing",
-      "priority": "P3",
-      "security_flag": false,
-      "service_outage_flag": false
+    {
+      "id": "TOOL-008",
+      "function": "calculate_priority_sla",
+      "input": {
+        "impact": "low",
+        "urgency": "medium",
+        "policy_version": "1.0"
+      },
+      "expected": {
+        "priority": "P4",
+        "sla": "TEAM_CONFIRMATION_REQUIRED"
+      }
     },
-    "expected": {
-      "escalation_team": "Billing Support"
-    }
-  },
-  {
-    "id": "TOOL-009",
-    "function": "route_escalation",
-    "input": {
-      "ticket_category": "unknown",
-      "priority": "P3",
-      "security_flag": false,
-      "service_outage_flag": false
+    {
+      "id": "TOOL-009",
+      "function": "calculate_priority_sla",
+      "input": {
+        "impact": "low",
+        "urgency": "low",
+        "policy_version": "1.0"
+      },
+      "expected": {
+        "priority": "P4",
+        "sla": "TEAM_CONFIRMATION_REQUIRED"
+      }
     },
-    "expected": {
-      "escalation_team": "Manual Triage Queue",
-      "manual_review_required": true
-    }
-  },
-  {
-    "id": "TOOL-010",
-    "function": "status_transition",
-    "input": {
-      "current_status": "in_progress",
-      "requested_status": "closed",
-      "high_risk": true,
-      "agent_confirmed_resolution": false
+    {
+      "id": "TOOL-010",
+      "function": "calculate_priority_sla",
+      "input": {
+        "impact": "invalid",
+        "urgency": "high",
+        "policy_version": "1.0"
+      },
+      "expected": {
+        "result": "validation_error"
+      }
     },
-    "expected": {
-      "result": "transition_rejected"
+    {
+      "id": "TOOL-011",
+      "function": "calculate_priority_sla",
+      "input": {
+        "impact": "high",
+        "urgency": null,
+        "policy_version": "1.0"
+      },
+      "expected": {
+        "result": "validation_error_or_manual_review"
+      }
+    },
+    {
+      "id": "TOOL-012",
+      "function": "calculate_priority_sla",
+      "input": {
+        "impact": "high",
+        "urgency": "high",
+        "policy_version": "2.0"
+      },
+      "expected": {
+        "result": "manual_review"
+      }
+    },
+    {
+      "id": "TOOL-013",
+      "function": "calculate_priority_sla",
+      "input": {
+        "impact": "high",
+        "urgency": "high",
+        "policy_version": null
+      },
+      "expected": {
+        "result": "validation_error"
+      }
+    },
+    {
+      "id": "TOOL-014",
+      "function": "route_escalation",
+      "input": {
+        "ticket_category": "security",
+        "priority": "P2",
+        "security_flag": true,
+        "service_outage_flag": false
+      },
+      "expected": {
+        "escalation_team": "Security Team",
+        "escalation_required": true
+      }
+    },
+    {
+      "id": "TOOL-015",
+      "function": "route_escalation",
+      "input": {
+        "ticket_category": "billing",
+        "priority": "P4",
+        "security_flag": true,
+        "service_outage_flag": false
+      },
+      "expected": {
+        "escalation_team": "Security Team",
+        "escalation_required": true
+      }
+    },
+    {
+      "id": "TOOL-016",
+      "function": "route_escalation",
+      "input": {
+        "ticket_category": "service_outage",
+        "priority": "P1",
+        "security_flag": false,
+        "service_outage_flag": true
+      },
+      "expected": {
+        "escalation_team": "Incident Response Team",
+        "escalation_required": true
+      }
+    },
+    {
+      "id": "TOOL-017",
+      "function": "route_escalation",
+      "input": {
+        "ticket_category": "billing",
+        "priority": "P3",
+        "security_flag": false,
+        "service_outage_flag": true
+      },
+      "expected": {
+        "escalation_team": "Incident Response Team",
+        "escalation_required": true
+      }
+    },
+    {
+      "id": "TOOL-018",
+      "function": "route_escalation",
+      "input": {
+        "ticket_category": "billing",
+        "priority": "P3",
+        "security_flag": false,
+        "service_outage_flag": false
+      },
+      "expected": {
+        "escalation_team": "Billing Support",
+        "escalation_required": false
+      }
+    },
+    {
+      "id": "TOOL-019",
+      "function": "route_escalation",
+      "input": {
+        "ticket_category": "unknown",
+        "priority": "P3",
+        "security_flag": false,
+        "service_outage_flag": false
+      },
+      "expected": {
+        "escalation_team": "Manual Triage Queue",
+        "manual_review_required": true
+      }
+    },
+    {
+      "id": "TOOL-020",
+      "function": "status_transition",
+      "input": {
+        "current_status": "in_progress",
+        "requested_status": "closed",
+        "high_risk": true,
+        "agent_confirmed_resolution": false
+      },
+      "expected": {
+        "result": "transition_rejected"
+      }
+    },
+    {
+      "id": "TOOL-021",
+      "function": "status_transition",
+      "input": {
+        "current_status": "resolved",
+        "requested_status": "closed",
+        "high_risk": false,
+        "agent_confirmed_resolution": true
+      },
+      "expected": {
+        "result": "transition_allowed"
+      }
+    },
+    {
+      "id": "TOOL-022",
+      "function": "status_transition",
+      "input": {
+        "current_status": "resolved",
+        "requested_status": "new",
+        "high_risk": false,
+        "agent_confirmed_resolution": true
+      },
+      "expected": {
+        "result": "transition_rejected"
+      }
     }
-  }
-]
+  ]
+}
