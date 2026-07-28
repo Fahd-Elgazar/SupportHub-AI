@@ -1,86 +1,45 @@
-# Acceptance Criteria
+# SupportHub AI Acceptance Criteria
 
-## Purpose
+## API request validation
 
-This document defines the conditions that SupportHub AI must satisfy to be considered functionally correct. These criteria provide measurable requirements for testing, validation, and project review.
+A request passes when:
 
-The system is considered acceptable only when all applicable criteria pass.
+- `question` is present
+- `question` is a string
+- trimming leaves at least 5 characters
+- the question is no longer than 2000 characters
 
----
+Invalid requests return HTTP 400 with `success: false`, a validation message, and field-level errors.
 
-# AI Response Requirements
+## Main response contract
 
-| ID | Requirement | Expected Result |
-|----|-------------|-----------------|
-| AC-01 | Grounded Answer | Every generated answer is based on approved documentation. |
-| AC-02 | Source Citation | Every answer references at least one approved source. |
-| AC-03 | Unsupported Question | If no approved information exists, return `No approved answer found` rather than generating unsupported content. |
-| AC-04 | No Fabrication | The AI must not invent product information, policies, or citations. |
-| AC-05 | Suggested Reply | Suggested replies remain consistent with the grounded answer. |
+A successful support request must:
 
----
+- return HTTP 200
+- return `success: true`
+- include every field required by `supportResponse.schema.js`
+- use only approved category, impact, urgency, priority, and status values
+- contain a non-empty source array
+- use an SLA value consistent with priority
+- use an escalation team consistent with priority and category
 
-# Classification Requirements
+## Deterministic correctness
 
-| ID | Requirement | Expected Result |
-|----|-------------|-----------------|
-| AC-06 | Ticket Category | Category matches an approved value in `taxonomy.md`. |
-| AC-07 | Impact | Impact matches the approved taxonomy. |
-| AC-08 | Urgency | Urgency matches the approved taxonomy. |
-| AC-09 | Invalid Classification | Unknown values are rejected or routed to manual review. |
+- Priority must match the 3×3 matrix.
+- SLA must match the priority-to-time map.
+- Every P1 ticket must route to `Critical Incident Team`.
+- Non-P1 tickets must route according to category.
 
----
+## Feedback
 
-# Deterministic Processing Requirements
+Valid feedback returns HTTP 201. Ratings outside 1–5 are rejected with HTTP 400.
 
-| ID | Requirement | Expected Result |
-|----|-------------|-----------------|
-| AC-10 | Priority Calculation | Priority is calculated using deterministic rules only. |
-| AC-11 | SLA Calculation | SLA is determined using the approved priority matrix. |
-| AC-12 | Escalation Routing | Tickets are routed to the correct support team based on deterministic rules. |
-| AC-13 | Status Control | Ticket status transitions follow the approved lifecycle. |
+## Operational endpoints
 
----
+- `/health` returns HTTP 200 and `status: healthy`.
+- `/version` returns API and prompt versions.
+- `/validate` confirms valid requests without generating an AI response.
 
-# Validation Requirements
+## Evaluation caveat
 
-| ID | Requirement | Expected Result |
-|----|-------------|-----------------|
-| AC-14 | Required Fields | Missing required fields produce validation errors. |
-| AC-15 | Enum Validation | Invalid taxonomy values are rejected. |
-| AC-16 | Source Validation | Only approved documentation sources may be used. |
-
----
-
-# Security Requirements
-
-| ID | Requirement | Expected Result |
-|----|-------------|-----------------|
-| AC-17 | High-Risk Tickets | High-risk or security-related tickets cannot be automatically closed. |
-| AC-18 | Prompt Injection | Prompt injection attempts do not modify application behavior. |
-| AC-19 | Confidential Information | Internal prompts, secrets, and implementation details are never exposed. |
-
----
-
-# Manual Review Requirements
-
-The application should require manual review when:
-
-- approved documentation is unavailable
-- deterministic calculation cannot be completed
-- taxonomy validation fails
-- routing rules cannot be applied
-- conflicting approved sources exist
-
----
-
-# Pass Criteria
-
-SupportHub AI is considered acceptable when:
-
-- All acceptance criteria pass.
-- No fabricated information is generated.
-- All deterministic calculations are reproducible.
-- All validation rules are enforced.
-- All routing decisions follow approved business rules.
-- All security requirements are satisfied.
+AI answer quality cannot be evaluated deterministically without controlling or mocking the external provider. Contract, taxonomy, and deterministic tool behavior can be evaluated locally.
