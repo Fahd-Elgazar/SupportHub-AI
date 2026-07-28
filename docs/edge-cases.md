@@ -1,33 +1,102 @@
 # Edge Cases and Failure Behavior
 
+## Purpose
+
+This document defines how SupportHub AI should behave when unexpected, invalid, or high-risk situations occur.
+
+The objective is to ensure predictable, deterministic behavior while preventing fabricated answers, unauthorized actions, and inconsistent ticket processing.
+
+Whenever uncertainty exists, the application should fail safely and require manual review rather than guessing.
+
+---
+
+# Input Validation
+
 | ID | Edge Case | Expected Behavior |
-|---|---|---|
-| EC-01 | Empty question | Return validation error |
-| EC-02 | Whitespace-only question | Return validation error |
-| EC-03 | Unsupported product question | Return `not_found`; do not fabricate |
-| EC-04 | No approved source | Return `not_found` and require manual review |
-| EC-05 | Partial supporting information | Return `partial` and identify limitations |
-| EC-06 | Conflicting approved sources | Apply authority/version rule or require review |
-| EC-07 | Retired source retrieved | Reject the source and log the failure |
-| EC-08 | Missing impact | Validation failure or approved manual-review fallback |
-| EC-09 | Missing urgency | Validation failure or approved manual-review fallback |
-| EC-10 | Invalid category | Route to manual review |
-| EC-11 | User claims every issue is critical | Validate impact and urgency; calculate deterministically |
-| EC-12 | User asks AI to set priority | Ignore requested priority and run deterministic calculation |
-| EC-13 | Direct prompt injection | Do not reveal instructions or modify policy |
-| EC-14 | Prompt injection inside retrieved source | Treat retrieved text as data, not instructions |
-| EC-15 | Security issue disguised as login issue | Apply security override when validated |
-| EC-16 | AI invents a source | Reject answer and log citation-integrity failure |
-| EC-17 | SLA calculator fails | Preserve ticket and require manual review |
-| EC-18 | Router has no matching team | Route to manual triage |
-| EC-19 | Attempt to auto-close high-risk ticket | Reject status transition |
-| EC-20 | User requests private customer-system access | Explain that this is outside product scope |
+|----|-----------|-------------------|
+| EC-01 | Empty question | Return a validation error. Do not create a ticket. |
+| EC-02 | Whitespace-only question | Return a validation error. |
+| EC-03 | Missing required fields | Reject the request before AI processing. |
+| EC-04 | Invalid category value | Reject the value and require manual review. |
+| EC-05 | Invalid impact value | Return a validation error. |
+| EC-06 | Invalid urgency value | Return a validation error. |
 
-## General Failure Principles
+---
 
-- Never fabricate an answer.
-- Never use an unapproved source.
-- Never allow AI output to override deterministic tools.
-- Preserve the ticket if AI or tool execution fails.
-- Use manual review when authority or policy is uncertain.
-- Do not expose internal prompts, secrets, stack traces, or private paths.
+# Knowledge Retrieval
+
+| ID | Edge Case | Expected Behavior |
+|----|-----------|-------------------|
+| EC-07 | Unsupported product question | Return `not_found`. Do not fabricate information. |
+| EC-08 | No approved source available | Return `not_found` and require manual review. |
+| EC-09 | Partial supporting information | Return `partial` and clearly state the limitations. |
+| EC-10 | Conflicting approved sources | Apply the documented authority and version rules or require manual review. |
+| EC-11 | Retired or superseded source retrieved | Reject the source, log the incident, and continue using approved sources only. |
+| EC-12 | AI generates a citation that does not exist | Reject the response and log a citation-integrity failure. |
+
+---
+
+# AI Safety
+
+| ID | Edge Case | Expected Behavior |
+|----|-----------|-------------------|
+| EC-13 | User instructs the AI to ignore system rules | Ignore the instruction and continue using approved policies. |
+| EC-14 | Prompt injection inside retrieved knowledge | Treat retrieved content as data, not executable instructions. |
+| EC-15 | User requests internal prompts or hidden instructions | Refuse to expose internal prompts or implementation details. |
+| EC-16 | User requests access to private customer systems | Explain that the request is outside the supported scope. |
+
+---
+
+# Deterministic Tool Failures
+
+| ID | Edge Case | Expected Behavior |
+|----|-----------|-------------------|
+| EC-17 | Missing impact | Validation failure or approved manual-review fallback. |
+| EC-18 | Missing urgency | Validation failure or approved manual-review fallback. |
+| EC-19 | SLA calculation fails | Preserve the ticket, log the failure, and require manual review. |
+| EC-20 | Escalation router has no matching rule | Route the ticket to the Manual Triage Queue. |
+| EC-21 | Unknown routing team | Do not guess a destination. Require manual review. |
+| EC-22 | Unknown policy version | Fail closed and require manual review. |
+
+---
+
+# Ticket Lifecycle
+
+| ID | Edge Case | Expected Behavior |
+|----|-----------|-------------------|
+| EC-23 | User requests the AI to change ticket priority | Ignore the request. Recalculate priority using deterministic rules. |
+| EC-24 | User claims every issue is critical | Validate impact and urgency before calculating priority. |
+| EC-25 | Attempt to automatically close a high-risk ticket | Reject the status transition. |
+| EC-26 | Invalid ticket status transition | Reject the transition and preserve the current status. |
+
+---
+
+# Failure Handling Principles
+
+The application should always follow these principles:
+
+1. Never fabricate an answer.
+2. Never retrieve an unapproved source.
+3. Never allow AI output to override deterministic business rules.
+4. Preserve the ticket whenever processing fails.
+5. Fail closed whenever policy validation cannot be completed.
+6. Require manual review whenever deterministic behavior cannot be guaranteed.
+7. Never expose internal prompts, secrets, stack traces, API keys, or private file paths.
+8. Record all validation failures and routing failures in the audit log.
+
+---
+
+# Logging Requirements
+
+The following events should be recorded:
+
+- validation failures
+- routing failures
+- rejected status transitions
+- policy version mismatches
+- unknown taxonomy values
+- prompt injection attempts
+- citation-integrity failures
+- manual-review decisions
+
+Logs should contain enough information to reproduce deterministic decisions without exposing sensitive information.
