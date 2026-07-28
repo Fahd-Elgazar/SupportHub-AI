@@ -1,83 +1,175 @@
-# Knowledge, Tools and Quality Module Scope
+# Knowledge, Tools, and Quality Module Scope
 
 ## Purpose
 
-This module controls the approved knowledge, ticket taxonomy, deterministic decision rules, quality tests, and release evidence for SupportHub AI.
+This module defines and maintains the knowledge governance, deterministic business rules, evaluation assets, and quality standards used by SupportHub AI.
 
-## In Scope
+Its primary objective is to ensure that AI-generated responses remain grounded in approved documentation while deterministic application logic enforces consistent business behavior.
 
-### Knowledge Governance
+---
+
+# Design Principles
+
+This module follows the following principles:
+
+- Approved knowledge only
+- Deterministic business rules
+- Traceable decisions
+- Reproducible behavior
+- Human oversight for high-risk cases
+- Separation of AI generation and application logic
+
+---
+
+# Module Responsibilities
+
+This module owns:
+
+- approved knowledge sources
+- taxonomy definitions
+- deterministic business rules
+- evaluation datasets
+- quality documentation
+- governance documentation
+
+---
+
+# In Scope
+
+## Knowledge Governance
 
 - Maintain the approved source register.
-- Define source ownership and approval status.
-- Version approved knowledge documents.
-- Prevent draft, expired, or retired content from being retrieved.
+- Define source ownership.
+- Define approval status.
+- Version approved documentation.
+- Prevent retrieval of draft, expired, or retired content.
 - Maintain source traceability.
 
-### Domain Taxonomy
+---
 
-- Define valid ticket categories.
-- Define impact and urgency levels.
+## Domain Taxonomy
+
+- Define ticket categories.
+- Define impact levels.
+- Define urgency levels.
 - Define priority levels.
 - Define escalation teams.
-- Define ticket statuses.
+- Define ticket lifecycle statuses.
 - Define fallback behavior for unknown values.
 
-### Deterministic Rules
+---
 
-- Specify the priority and SLA matrix.
+## Deterministic Rules
+
+- Specify the priority matrix.
+- Specify SLA calculation rules.
 - Specify escalation routing.
 - Define rule precedence.
+- Define validation rules.
 - Define manual-review conditions.
-- Define high-risk ticket restrictions.
+- Define high-risk restrictions.
 
-### Quality Assurance
+---
 
-- Maintain normal evaluation cases.
-- Maintain malformed-input cases.
-- Maintain unsupported-question cases.
-- Maintain prompt-injection cases.
+## Quality Assurance
+
+- Maintain evaluation datasets.
+- Maintain malformed-input tests.
+- Maintain unsupported-question tests.
+- Maintain prompt-injection tests.
 - Maintain deterministic tool tests.
 - Record acceptance evidence.
+- Review documentation consistency.
 
-## Out of Scope
+---
 
-- Accessing private customer systems.
-- Automatically closing high-risk tickets.
-- Generating answers without approved source evidence.
-- Allowing AI output to override deterministic rules.
-- Automatically publishing user feedback as authoritative knowledge.
+# Out of Scope
 
-## AI-Generated Responsibilities
+This module does not:
+
+- access private customer systems
+- retrieve unapproved documentation
+- automatically close high-risk tickets
+- allow AI output to override deterministic rules
+- publish user feedback as authoritative knowledge
+- modify production application code
+
+---
+
+# AI Responsibilities
 
 The AI may propose:
 
-- `answer`
-- `ticket_category`
-- `impact`
-- `urgency`
-- `suggested_reply`
+- answer
+- ticket_category
+- impact
+- urgency
+- suggested_reply
 - explanation or rationale
 
-AI-generated values are untrusted until validated.
+AI-generated values are advisory and remain untrusted until validated.
 
-## Deterministic Application Responsibilities
+---
 
-Application logic controls:
+# Deterministic Application Responsibilities
+
+Application logic is responsible for:
 
 - input validation
-- allowed enum values
+- taxonomy validation
 - source authorization
 - priority calculation
 - SLA calculation
 - escalation routing
-- status transitions
+- ticket status transitions
 - high-risk restrictions
-- audit records
+- audit logging
 
-The AI must not authoritatively assign:
+The application is the authoritative decision maker.
 
-- `priority`
-- `sla`
-- `escalation_team`
-- final `status`
+---
+
+# Module Interfaces
+
+## Inputs
+
+- Approved knowledge documents
+- Source register
+- Ticket taxonomy
+- Business rules
+- Team-approved policies
+
+## Outputs
+
+- Grounded knowledge responses
+- Validated classifications
+- Deterministic rule specifications
+- Evaluation datasets
+- Quality documentation
+- Governance artifacts
+
+---
+
+# Dependencies
+
+This module depends on:
+
+- approved knowledge documents
+- deterministic application logic
+- evaluation framework
+- project governance
+- team-approved policies
+
+---
+
+# Deliverables
+
+This module maintains:
+
+- knowledge documentation
+- taxonomy documentation
+- deterministic tool specifications
+- evaluation test cases
+- acceptance criteria
+- governance documents
+- release evidence
