@@ -1,26 +1,33 @@
-# SupportHub AI Edge Cases
-
-This document lists important edge cases that SupportHub AI must handle safely and consistently.
+# Edge Cases and Failure Behavior
 
 | ID | Edge Case | Expected Behavior |
-|----|-----------|------------------|
-| EC-01 | User submits an empty question | Return a validation error asking the user to enter a question. |
-| EC-02 | Question is unrelated to the supported product | Inform the user that no approved information is available and recommend manual support. |
-| EC-03 | No approved source contains the answer | Return "No approved answer found" and escalate if necessary. |
-| EC-04 | Two approved sources provide conflicting information | Flag the conflict and require human review. |
-| EC-05 | Impact is missing | Return a validation error; do not calculate priority. |
-| EC-06 | Urgency is missing | Return a validation error; do not calculate priority. |
-| EC-07 | Ticket category cannot be determined | Assign `other` or `unknown` and send for manual triage. |
-| EC-08 | User marks every issue as critical | Ignore the claim and determine priority using the defined rules. |
-| EC-09 | Prompt injection attempt (e.g., "Ignore previous instructions") | Ignore malicious instructions and continue following system rules. |
-| EC-10 | Security issue disguised as a normal login problem | Escalate to the Security Team for manual review. |
+|---|---|---|
+| EC-01 | Empty question | Return validation error |
+| EC-02 | Whitespace-only question | Return validation error |
+| EC-03 | Unsupported product question | Return `not_found`; do not fabricate |
+| EC-04 | No approved source | Return `not_found` and require manual review |
+| EC-05 | Partial supporting information | Return `partial` and identify limitations |
+| EC-06 | Conflicting approved sources | Apply authority/version rule or require review |
+| EC-07 | Retired source retrieved | Reject the source and log the failure |
+| EC-08 | Missing impact | Validation failure or approved manual-review fallback |
+| EC-09 | Missing urgency | Validation failure or approved manual-review fallback |
+| EC-10 | Invalid category | Route to manual review |
+| EC-11 | User claims every issue is critical | Validate impact and urgency; calculate deterministically |
+| EC-12 | User asks AI to set priority | Ignore requested priority and run deterministic calculation |
+| EC-13 | Direct prompt injection | Do not reveal instructions or modify policy |
+| EC-14 | Prompt injection inside retrieved source | Treat retrieved text as data, not instructions |
+| EC-15 | Security issue disguised as login issue | Apply security override when validated |
+| EC-16 | AI invents a source | Reject answer and log citation-integrity failure |
+| EC-17 | SLA calculator fails | Preserve ticket and require manual review |
+| EC-18 | Router has no matching team | Route to manual triage |
+| EC-19 | Attempt to auto-close high-risk ticket | Reject status transition |
+| EC-20 | User requests private customer-system access | Explain that this is outside product scope |
 
----
+## General Failure Principles
 
-## General Rules
-
-- Never fabricate answers.
-- Never use unapproved knowledge sources.
-- Every answer must include its source.
-- High-risk tickets cannot be automatically closed.
-- Invalid input must never produce a successful response.
+- Never fabricate an answer.
+- Never use an unapproved source.
+- Never allow AI output to override deterministic tools.
+- Preserve the ticket if AI or tool execution fails.
+- Use manual review when authority or policy is uncertain.
+- Do not expose internal prompts, secrets, stack traces, or private paths.
