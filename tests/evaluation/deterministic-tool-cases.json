@@ -140,7 +140,7 @@
         "policy_version": "1.0"
       },
       "expected": {
-        "result": "validation_error_or_manual_review"
+        "result": "validation_error"
       }
     },
     {
