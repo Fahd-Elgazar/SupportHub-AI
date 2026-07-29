@@ -2,6 +2,10 @@ const provider = require("./providers");
 
 const responseSchema = require("../schemas/supportResponse.schema");
 
+const ticketModel = require("../models/ticket.model");
+
+const taxonomy = require("../config/taxonomy");
+
 const {
   calculatePriority,
   calculateSLA,
@@ -11,123 +15,140 @@ const {
   getEscalationTeam,
 } = require("../tools/escalationTool");
 
-/**
- * Normalize AI output so it always matches our schema
- */
+/*
+|--------------------------------------------------------------------------
+| Normalize AI Output
+|--------------------------------------------------------------------------
+*/
+
 function normalizeCategory(category = "") {
   const value = category.toLowerCase();
 
-  if (
-    value.includes("login") ||
-    value.includes("password") ||
-    value.includes("account") ||
-    value.includes("authentication")
-  ) {
-    return "Account";
-  }
+  if (value.includes("account")) return "account_access";
 
-  if (
-    value.includes("billing") ||
-    value.includes("invoice") ||
-    value.includes("payment")
-  ) {
-    return "Billing";
-  }
+  if (value.includes("login")) return "account_access";
 
-  if (value.includes("bug")) {
-    return "Bug";
-  }
+  if (value.includes("password")) return "account_access";
 
-  if (value.includes("feature")) {
-    return "Feature Request";
-  }
+  if (value.includes("technical")) return "technical_issue";
 
-  if (
-    value.includes("technical") ||
-    value.includes("server") ||
-    value.includes("database") ||
-    value.includes("system")
-  ) {
-    return "Technical";
-  }
+  if (value.includes("bug")) return "technical_issue";
 
-  return "General";
+  if (value.includes("billing")) return "billing";
+
+  if (value.includes("payment")) return "billing";
+
+  if (value.includes("product")) return "product_question";
+
+  if (value.includes("feature")) return "product_question";
+
+  if (value.includes("security")) return "security";
+
+  if (value.includes("hack")) return "security";
+
+  if (value.includes("outage")) return "service_outage";
+
+  return "other";
 }
 
-function normalizeImpact(value = "") {
+function normalizeLevel(value = "") {
   value = value.toLowerCase();
 
-  if (value === "high") return "High";
-  if (value === "medium") return "Medium";
+  if (value.includes("high")) return "high";
 
-  return "Low";
+  if (value.includes("medium")) return "medium";
+
+  return "low";
 }
 
-function normalizeUrgency(value = "") {
-  value = value.toLowerCase();
+/*
+|--------------------------------------------------------------------------
+| Generate Support Response
+|--------------------------------------------------------------------------
+*/
 
-  if (value === "high") return "High";
-  if (value === "medium") return "Medium";
-
-  return "Low";
-}
-
-async function generateSupportResponse(question) {
+const generateSupportResponse = async (question) => {
   try {
-    // ==========================
-    // Ask AI Provider
-    // ==========================
-
-    const aiResponse = await provider.generate(question);
-
-    console.log("========== AI RESPONSE ==========");
-    console.dir(aiResponse, { depth: null });
-
-    // ==========================
-    // Normalize AI Output
-    // ==========================
+    const ai = await provider.generate(question);
 
     const ticketCategory = normalizeCategory(
-      aiResponse.ticket_category
+      ai.ticket_category
     );
 
-    const impact = normalizeImpact(aiResponse.impact);
+    const impact = normalizeLevel(ai.impact);
 
-    const urgency = normalizeUrgency(aiResponse.urgency);
+    const urgency = normalizeLevel(ai.urgency);
 
-    // ==========================
-    // Business Logic
-    // ==========================
+    /*
+    ------------------------------------------
+    Validate taxonomy
+    ------------------------------------------
+    */
+
+    if (!taxonomy.categories.includes(ticketCategory)) {
+      throw new Error("Invalid ticket category");
+    }
+
+    if (!taxonomy.impact.includes(impact)) {
+      throw new Error("Invalid impact");
+    }
+
+    if (!taxonomy.urgency.includes(urgency)) {
+      throw new Error("Invalid urgency");
+    }
+
+    /*
+    ------------------------------------------
+    Calculate Priority
+    ------------------------------------------
+    */
 
     const priority = calculatePriority(
       impact,
       urgency
     );
 
+    /*
+    ------------------------------------------
+    Calculate SLA
+    ------------------------------------------
+    */
+
     const sla = calculateSLA(priority);
 
-    const escalationTeam = getEscalationTeam(
-      priority,
-      ticketCategory
-    );
+    /*
+    ------------------------------------------
+    Escalation
+    ------------------------------------------
+    */
 
-    // ==========================
-    // Final Response
-    // ==========================
+    const escalationTeam =
+      getEscalationTeam(
+        priority,
+        ticketCategory
+      );
 
-    const response = {
+    /*
+    ------------------------------------------
+    Final Ticket
+    ------------------------------------------
+    */
+
+    const ticket = {
+
       question,
 
       answer:
-        aiResponse.answer ||
-        "No answer generated.",
+        ai.answer ||
+        "No answer returned.",
 
       source:
-        aiResponse.source || [
+        ai.source || [
           "Internal Knowledge Base",
         ],
 
-      ticket_category: ticketCategory,
+      ticket_category:
+        ticketCategory,
 
       impact,
 
@@ -137,66 +158,77 @@ async function generateSupportResponse(question) {
 
       sla,
 
-      escalation_team: escalationTeam,
+      escalation_team:
+        escalationTeam,
 
       suggested_reply:
-        aiResponse.suggested_reply ||
+        ai.suggested_reply ||
         "Thank you for contacting SupportHub.",
 
       status:
-        aiResponse.status || "Open",
+        ai.status || "Open",
+
     };
 
-    // ==========================
-    // Validate Response
-    // ==========================
+    /*
+    ------------------------------------------
+    Validate Response
+    ------------------------------------------
+    */
 
     const { error, value } =
-      responseSchema.validate(response, {
+      responseSchema.validate(ticket, {
+
         abortEarly: false,
+
         stripUnknown: true,
+
       });
 
     if (error) {
       throw new Error(
-        `Response validation failed: ${error.details
-          .map((d) => d.message)
-          .join(", ")}`
+        error.details
+          .map((e) => e.message)
+          .join(", ")
       );
     }
 
-    return value;
+    /*
+    ------------------------------------------
+    Save Ticket
+    ------------------------------------------
+    */
+
+    const savedTicket =
+      await ticketModel.createTicket(value);
+
+    return savedTicket;
+
   } catch (error) {
-    console.error("SupportHub Service Error:");
-    console.error(error);
 
     throw new Error(
       `SupportHub Service Error: ${error.message}`
     );
+
   }
-}
+};
 
-/**
- * Save feedback
- * Replace with database later
- */
-async function saveFeedback(feedback) {
-  return {
-    id: Date.now().toString(),
+/*
+|--------------------------------------------------------------------------
+| Feedback
+|--------------------------------------------------------------------------
+*/
 
-    question: feedback.question,
+const saveFeedback = async (feedback) => {
 
-    answer: feedback.answer,
+  return feedback;
 
-    rating: feedback.rating,
-
-    comment: feedback.comment || "",
-
-    createdAt: new Date().toISOString(),
-  };
-}
+};
 
 module.exports = {
+
   generateSupportResponse,
+
   saveFeedback,
+
 };

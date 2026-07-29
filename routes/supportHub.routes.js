@@ -1,54 +1,84 @@
 const express = require("express");
+
 const router = express.Router();
 
-const supportController = require("../controllers/supportHub.controller");
+const controller = require("../controllers/supportHub.controller");
+
 const validate = require("../middleware/validate");
 
-const {
-  supportRequestSchema,
-  feedbackSchema,
-} = require("../schemas/supportRequest.schema");
+const supportRequestSchema = require("../schemas/supportRequest.schema");
+const feedbackSchema = require("../schemas/feedback.schema");
 
 /*
- * POST /api/supporthub-ai
- * Ask AI a support question
- */
+|--------------------------------------------------------------------------
+| AI Support
+|--------------------------------------------------------------------------
+*/
+
 router.post(
   "/",
   validate(supportRequestSchema),
-  supportController.askSupport
+  controller.askSupport
 );
 
 /*
- * POST /api/supporthub-ai/feedback
- * Save user feedback about AI response
- */
+|--------------------------------------------------------------------------
+| Feedback
+|--------------------------------------------------------------------------
+*/
+
 router.post(
   "/feedback",
   validate(feedbackSchema),
-  supportController.submitFeedback
+  controller.submitFeedback
 );
 
 /*
- * GET /api/supporthub-ai/health
- * Health check
- */
-router.get("/health", supportController.healthCheck);
+|--------------------------------------------------------------------------
+| Tickets
+|--------------------------------------------------------------------------
+*/
+
+router.get(
+  "/tickets",
+  controller.getTickets
+);
+
+router.get(
+  "/ticket/:id",
+  controller.getTicketById
+);
 
 /*
- * GET /api/supporthub-ai/version
- * Prompt/API version
- */
-router.get("/version", supportController.version);
+|--------------------------------------------------------------------------
+| Feedback
+|--------------------------------------------------------------------------
+*/
+
+router.get(
+  "/feedback",
+  controller.getFeedback
+);
 
 /*
- * POST /api/supporthub-ai/validate
- * Validate request only
- */
-router.post(
+|--------------------------------------------------------------------------
+| Utilities
+|--------------------------------------------------------------------------
+*/
+
+router.get(
+  "/health",
+  controller.healthCheck
+);
+
+router.get(
+  "/version",
+  controller.version
+);
+
+router.get(
   "/validate",
-  validate(supportRequestSchema),
-  supportController.validateRequest
+  controller.validateRequest
 );
 
 module.exports = router;

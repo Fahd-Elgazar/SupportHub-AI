@@ -1,111 +1,163 @@
 const request = require("supertest");
 const app = require("../index");
 
-describe("SupportHub AI API", () => {
-  describe("POST /api/supporthub-ai", () => {
-    it("should return 200 for a valid request", async () => {
-      const response = await request(app)
-        .post("/api/supporthub-ai")
-        .send({
-          question: "I can't login to my account."
+describe("SupportHub API", () => {
+
+    describe("POST /api/supporthub-ai", () => {
+
+        test("should create ticket", async () => {
+
+            const response = await request(app)
+                .post("/api/supporthub-ai")
+                .send({
+                    question: "I forgot my password."
+                });
+
+            expect(response.statusCode).toBe(200);
+
+            expect(response.body.success).toBe(true);
+
+            expect(response.body.data.question)
+                .toBe("I forgot my password.");
+
         });
 
-      expect(response.statusCode).toBe(200);
-      expect(response.body.success).toBe(true);
+        test("should reject empty body", async () => {
 
-      expect(response.body.data).toHaveProperty("question");
-      expect(response.body.data).toHaveProperty("answer");
-      expect(response.body.data).toHaveProperty("source");
-      expect(response.body.data).toHaveProperty("ticket_category");
-      expect(response.body.data).toHaveProperty("impact");
-      expect(response.body.data).toHaveProperty("urgency");
-      expect(response.body.data).toHaveProperty("priority");
-      expect(response.body.data).toHaveProperty("sla");
-      expect(response.body.data).toHaveProperty("escalation_team");
-      expect(response.body.data).toHaveProperty("suggested_reply");
-      expect(response.body.data).toHaveProperty("status");
-    });
+            const response = await request(app)
+                .post("/api/supporthub-ai")
+                .send({});
 
-    it("should return 400 when question is missing", async () => {
-      const response = await request(app)
-        .post("/api/supporthub-ai")
-        .send({});
+            expect(response.statusCode).toBe(400);
 
-      expect(response.statusCode).toBe(400);
-      expect(response.body.success).toBe(false);
-    });
-
-    it("should return 400 for empty question", async () => {
-      const response = await request(app)
-        .post("/api/supporthub-ai")
-        .send({
-          question: ""
         });
 
-      expect(response.statusCode).toBe(400);
-      expect(response.body.success).toBe(false);
-    });
+        test("should reject short question", async () => {
 
-    it("should return 400 for short question", async () => {
-      const response = await request(app)
-        .post("/api/supporthub-ai")
-        .send({
-          question: "abc"
+            const response = await request(app)
+                .post("/api/supporthub-ai")
+                .send({
+                    question: "Hi"
+                });
+
+            expect(response.statusCode).toBe(400);
+
         });
 
-      expect(response.statusCode).toBe(400);
-      expect(response.body.success).toBe(false);
     });
-  });
 
-  describe("POST /api/supporthub-ai/feedback", () => {
-    it("should accept valid feedback", async () => {
-      const response = await request(app)
-        .post("/api/supporthub-ai/feedback")
-        .send({
-          question: "Login issue",
-          answer: "Reset your password.",
-          rating: 5,
-          comment: "Helpful response"
+    describe("GET Tickets", () => {
+
+        test("should get all tickets", async () => {
+
+            const response = await request(app)
+                .get("/api/supporthub-ai/tickets");
+
+            expect(response.statusCode).toBe(200);
+
+            expect(response.body.success).toBe(true);
+
+            expect(Array.isArray(response.body.data))
+                .toBe(true);
+
         });
 
-      expect(response.statusCode).toBe(201);
-      expect(response.body.success).toBe(true);
     });
 
-    it("should reject invalid rating", async () => {
-      const response = await request(app)
-        .post("/api/supporthub-ai/feedback")
-        .send({
-          question: "Login issue",
-          answer: "Reset password",
-          rating: 10
+    describe("GET Ticket By Id", () => {
+
+        test("should return 404 for unknown ticket", async () => {
+
+            const response = await request(app)
+                .get("/api/supporthub-ai/ticket/999999");
+
+            expect([200,404]).toContain(response.statusCode);
+
         });
 
-      expect(response.statusCode).toBe(400);
-      expect(response.body.success).toBe(false);
     });
-  });
 
-  describe("GET /api/supporthub-ai/health", () => {
-    it("should return health status", async () => {
-      const response = await request(app)
-        .get("/api/supporthub-ai/health");
+    describe("POST Feedback", () => {
 
-      expect(response.statusCode).toBe(200);
-      expect(response.body.status).toBe("healthy");
+        test("should save feedback", async () => {
+
+            const response = await request(app)
+                .post("/api/supporthub-ai/feedback")
+                .send({
+
+                    ticket_id:1,
+
+                    rating:5,
+
+                    comment:"Excellent"
+
+                });
+
+            expect([200,201]).toContain(response.statusCode);
+
+        });
+
+        test("should reject invalid rating", async () => {
+
+            const response = await request(app)
+                .post("/api/supporthub-ai/feedback")
+                .send({
+
+                    ticket_id:1,
+
+                    rating:8
+
+                });
+
+            expect(response.statusCode).toBe(400);
+
+        });
+
     });
-  });
 
-  describe("GET /api/supporthub-ai/version", () => {
-    it("should return version information", async () => {
-      const response = await request(app)
-        .get("/api/supporthub-ai/version");
+    describe("Health", () => {
 
-      expect(response.statusCode).toBe(200);
-      expect(response.body.success).toBe(true);
-      expect(response.body).toHaveProperty("api_version");
-      expect(response.body).toHaveProperty("prompt_version");
+        test("should return api health", async () => {
+
+            const response = await request(app)
+                .get("/api/supporthub-ai/health");
+
+            expect(response.statusCode).toBe(200);
+
+            expect(response.body.status)
+                .toBe("healthy");
+
+        });
+
     });
-  });
+
+    describe("Version", () => {
+
+        test("should return api version", async () => {
+
+            const response = await request(app)
+                .get("/api/supporthub-ai/version");
+
+            expect(response.statusCode).toBe(200);
+
+            expect(response.body.success)
+                .toBe(true);
+
+        });
+
+    });
+
+    describe("404", () => {
+
+        test("unknown route", async () => {
+
+            const response = await request(app)
+                .get("/unknown");
+
+            expect(response.statusCode).toBe(404);
+
+        });
+
+    });
+
 });

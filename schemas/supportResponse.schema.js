@@ -1,6 +1,7 @@
 const Joi = require("joi");
 
-const supportResponseSchema = Joi.object({
+module.exports = Joi.object({
+
   question: Joi.string().required(),
 
   answer: Joi.string().required(),
@@ -11,25 +12,39 @@ const supportResponseSchema = Joi.object({
 
   ticket_category: Joi.string()
     .valid(
-      "Technical",
-      "Billing",
-      "Account",
-      "General",
-      "Bug",
-      "Feature Request"
+      "account_access",
+      "technical_issue",
+      "billing",
+      "product_question",
+      "security",
+      "service_outage",
+      "other"
     )
     .required(),
 
   impact: Joi.string()
-    .valid("Low", "Medium", "High")
+    .valid(
+      "low",
+      "medium",
+      "high"
+    )
     .required(),
 
   urgency: Joi.string()
-    .valid("Low", "Medium", "High")
+    .valid(
+      "low",
+      "medium",
+      "high"
+    )
     .required(),
 
   priority: Joi.string()
-    .valid("P1", "P2", "P3", "P4")
+    .valid(
+      "P1",
+      "P2",
+      "P3",
+      "P4"
+    )
     .required(),
 
   sla: Joi.string().required(),
@@ -39,8 +54,12 @@ const supportResponseSchema = Joi.object({
   suggested_reply: Joi.string().required(),
 
   status: Joi.string()
-    .valid("Open", "Pending", "Escalated", "Resolved")
-    .required()
-});
+    .valid(
+      "Open",
+      "In Progress",
+      "Resolved",
+      "Closed"
+    )
+    .required(),
 
-module.exports = supportResponseSchema;
+});
