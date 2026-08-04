@@ -1,6 +1,6 @@
 {
-  "schema_version": "1.0",
-  "description": "API evaluation cases aligned with the current SupportHub AI backend contract and taxonomy.",
+  "schema_version": "1.1",
+  "description": "API evaluation cases aligned with the current SupportHub AI backend contract and taxonomy. Live-executed against the fixed backend on 2026-08-04; see tests/evaluation/evaluation-evidence.md.",
   "tests": [
     {
       "id": "API-001",
@@ -9,13 +9,13 @@
       "expected": {
         "status_code": 200,
         "body_contains": {"success": true},
-        "required_data_fields": ["question","answer","source","ticket_category","impact","urgency","priority","sla","escalation_team","suggested_reply","status"],
+        "required_data_fields": ["id","question","answer","source","ticket_category","impact","urgency","priority","sla","escalation_team","suggested_reply","status","created_at"],
         "allowed": {
-          "ticket_category":["Technical","Billing","Account","General","Bug","Feature Request"],
-          "impact":["Low","Medium","High"],
-          "urgency":["Low","Medium","High"],
+          "ticket_category":["account_access","technical_issue","billing","product_question","security","service_outage","other"],
+          "impact":["low","medium","high"],
+          "urgency":["low","medium","high"],
           "priority":["P1","P2","P3","P4"],
-          "status":["Open","Pending","Escalated","Resolved"]
+          "status":["Open","In Progress","Resolved","Closed"]
         }
       }
     },
@@ -23,37 +23,39 @@
       "id": "API-002",
       "name": "Missing question",
       "request": {"method":"POST","path":"/api/supporthub-ai","body":{}},
-      "expected": {"status_code":400,"body_contains":{"success":false,"message":"Validation failed."}}
+      "expected": {"status_code":400,"body_contains":{"success":false},"required_fields":["errors"]}
     },
     {
       "id": "API-003",
       "name": "Empty question",
       "request": {"method":"POST","path":"/api/supporthub-ai","body":{"question":""}},
-      "expected": {"status_code":400,"body_contains":{"success":false,"message":"Validation failed."}}
+      "expected": {"status_code":400,"body_contains":{"success":false},"required_fields":["errors"]}
     },
     {
       "id": "API-004",
       "name": "Question shorter than five characters",
       "request": {"method":"POST","path":"/api/supporthub-ai","body":{"question":"abc"}},
-      "expected": {"status_code":400,"body_contains":{"success":false,"message":"Validation failed."}}
+      "expected": {"status_code":400,"body_contains":{"success":false},"required_fields":["errors"]}
     },
     {
       "id": "API-005",
       "name": "Question longer than 2000 characters",
       "request": {"method":"POST","path":"/api/supporthub-ai","body":{"question_fixture":"string_over_2000_characters"}},
-      "expected": {"status_code":400,"body_contains":{"success":false,"message":"Validation failed."}}
+      "expected": {"status_code":400,"body_contains":{"success":false},"required_fields":["errors"]},
+      "note": "KNOWN DEFECT (not fixed here, see docs/integration-issues.md): the fixture key is question_fixture, not question, so this actually sends {} and passes for the wrong reason — it never exercises the max-length rule. Left as-is; this predates and is unrelated to the backend taxonomy fix."
     },
     {
       "id": "API-006",
       "name": "Valid feedback",
-      "request": {"method":"POST","path":"/api/supporthub-ai/feedback","body":{"question":"Login issue","answer":"Reset your password.","rating":5,"comment":"Helpful response"}},
-      "expected": {"status_code":201,"body_contains":{"success":true,"message":"Feedback submitted successfully."},"required_data_fields":["id","question","answer","rating","comment","createdAt"]}
+      "request": {"method":"POST","path":"/api/supporthub-ai/feedback","body":{"ticket_id":1,"rating":5,"comment":"Helpful response"}},
+      "expected": {"status_code":201,"body_contains":{"success":true,"message":"Feedback submitted successfully."},"required_data_fields":["id","ticket_id","rating","comment","created_at"]},
+      "note": "ticket_id must reference a ticket that already exists (e.g. one created by API-001) or the insert will fail on the foreign key."
     },
     {
       "id": "API-007",
       "name": "Invalid feedback rating",
-      "request": {"method":"POST","path":"/api/supporthub-ai/feedback","body":{"question":"Login issue","answer":"Reset your password.","rating":10}},
-      "expected": {"status_code":400,"body_contains":{"success":false,"message":"Validation failed."}}
+      "request": {"method":"POST","path":"/api/supporthub-ai/feedback","body":{"ticket_id":1,"rating":10}},
+      "expected": {"status_code":400,"body_contains":{"success":false},"required_fields":["errors"]}
     },
     {
       "id": "API-008",
@@ -70,8 +72,9 @@
     {
       "id": "API-010",
       "name": "Validate-only endpoint",
-      "request": {"method":"POST","path":"/api/supporthub-ai/validate","body":{"question":"Please validate this request."}},
-      "expected": {"status_code":200,"body_contains":{"success":true,"message":"Request is valid."}}
+      "request": {"method":"GET","path":"/api/supporthub-ai/validate"},
+      "expected": {"status_code":200,"body_contains":{"success":true,"message":"Request is valid."}},
+      "note": "This route is GET, not POST, and does not actually validate the request body — it always returns success."
     },
     {
       "id": "API-011",

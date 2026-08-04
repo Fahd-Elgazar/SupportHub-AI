@@ -26,18 +26,21 @@ Content-Type: application/json
 ```json
 {
   "success": true,
+  "message": "Ticket processed successfully.",
   "data": {
+    "id": 1,
     "question": "I cannot log in to my account.",
     "answer": "...",
     "source": ["Internal Knowledge Base"],
-    "ticket_category": "Account",
-    "impact": "Low",
-    "urgency": "Low",
+    "ticket_category": "account_access",
+    "impact": "low",
+    "urgency": "low",
     "priority": "P4",
     "sla": "48 Hours",
     "escalation_team": "Account Support Team",
     "suggested_reply": "...",
-    "status": "Open"
+    "status": "Open",
+    "created_at": "..."
   }
 }
 ```
@@ -49,15 +52,13 @@ The AI-generated text and classification can vary, but the response shape and al
 ```json
 {
   "success": false,
-  "message": "Validation failed.",
   "errors": [
-    {
-      "field": "question",
-      "message": "Question is required."
-    }
+    "Question is required."
   ]
 }
 ```
+
+`errors` is an array of plain message strings (one per failed rule, from Joi's `error.details`), not objects with `field`/`message` keys. There is no top-level `message` field on this response. This applies to both `POST /api/supporthub-ai` and `POST /api/supporthub-ai/feedback`.
 
 ## 2. Submit feedback
 
@@ -70,12 +71,13 @@ Content-Type: application/json
 
 ```json
 {
-  "question": "Login issue",
-  "answer": "Reset your password.",
+  "ticket_id": 1,
   "rating": 5,
   "comment": "Helpful response"
 }
 ```
+
+`ticket_id` must be the `id` of an existing ticket returned by the main endpoint. `comment` is optional.
 
 ### Success response — 201
 
@@ -84,12 +86,11 @@ Content-Type: application/json
   "success": true,
   "message": "Feedback submitted successfully.",
   "data": {
-    "id": "...",
-    "question": "Login issue",
-    "answer": "Reset your password.",
+    "id": 1,
+    "ticket_id": 1,
     "rating": 5,
     "comment": "Helpful response",
-    "createdAt": "..."
+    "created_at": "..."
   }
 }
 ```
@@ -132,15 +133,10 @@ The provider value depends on environment configuration.
 ## 5. Validate request only
 
 ```http
-POST /api/supporthub-ai/validate
-Content-Type: application/json
+GET /api/supporthub-ai/validate
 ```
 
-```json
-{
-  "question": "Please validate this support request."
-}
-```
+This is a `GET` route, not `POST`. It takes no body and does not read the request at all — it unconditionally returns success. It does not perform any actual validation of a question; use `POST /api/supporthub-ai` itself (which validates before generating) to check whether a question would be accepted.
 
 ### Success response — 200
 

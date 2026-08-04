@@ -34,7 +34,7 @@ The backend validates status values but does not implement deterministic status-
 
 ## Feedback persistence
 
-Feedback is not stored in a database. The service returns a temporary timestamp-based record only.
+Feedback is stored in PostgreSQL (`feedback` table, keyed by `ticket_id`). This was previously listed as a limitation; it is implemented as of the backend critical-fixes pass.
 
 ## Source traceability
 

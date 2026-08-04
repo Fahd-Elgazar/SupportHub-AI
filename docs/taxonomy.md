@@ -8,28 +8,29 @@ This document defines the exact values currently accepted and returned by the Su
 
 | Value | Meaning |
 |---|---|
-| `Technical` | Technical, server, database, or system issues |
-| `Billing` | Billing, invoice, payment, or subscription issues |
-| `Account` | Login, password, account, or authentication issues |
-| `General` | Requests that do not match another category |
-| `Bug` | Reported software defects |
-| `Feature Request` | Requests for new or changed functionality |
+| `account_access` | Login, password, account, or authentication issues |
+| `technical_issue` | Technical, server, database, or system issues, and reported bugs |
+| `billing` | Billing, invoice, payment, or subscription issues |
+| `product_question` | Product or feature questions and requests |
+| `security` | Security or compromise reports |
+| `service_outage` | Service-wide outage reports |
+| `other` | Requests that do not match another category |
 
 ## Impact
 
 Allowed values:
 
-- `Low`
-- `Medium`
-- `High`
+- `low`
+- `medium`
+- `high`
 
 ## Urgency
 
 Allowed values:
 
-- `Low`
-- `Medium`
-- `High`
+- `low`
+- `medium`
+- `high`
 
 ## Priority
 
@@ -47,9 +48,9 @@ Priority is calculated deterministically from impact and urgency.
 Allowed response values:
 
 - `Open`
-- `Pending`
-- `Escalated`
+- `In Progress`
 - `Resolved`
+- `Closed`
 
 The current AI prompt instructs the model to return `Open`. The response schema accepts all four values.
 
@@ -57,14 +58,15 @@ The current AI prompt instructs the model to return `Open`. The response schema 
 
 The service normalizes model output before validation:
 
-- login, password, account, or authentication terms become `Account`
-- billing, invoice, or payment terms become `Billing`
-- bug terms become `Bug`
-- feature terms become `Feature Request`
-- technical, server, database, or system terms become `Technical`
-- unmatched values become `General`
+- `account`, `login`, or `password` terms become `account_access`
+- `technical` or `bug` terms become `technical_issue`
+- `billing` or `payment` terms become `billing`
+- `product` or `feature` terms become `product_question`
+- `security` or `hack` terms become `security`
+- `outage` terms become `service_outage`
+- unmatched values become `other`
 
-Impact and urgency are normalized to `High`, `Medium`, or `Low`. Unrecognized values fall back to `Low`.
+Impact and urgency are normalized to `high`, `medium`, or `low`. Unrecognized values fall back to `low`.
 
 ## Governance
 

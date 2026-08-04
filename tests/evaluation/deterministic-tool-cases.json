@@ -1,18 +1,18 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "1.1",
   "description": "Deterministic evaluation cases aligned with the current SupportHub AI backend priority, SLA, and escalation tools.",
   "tests": [
-    {"id":"TOOL-001","function":"calculatePriority","input":{"impact":"High","urgency":"High"},"expected":{"result":"P1"}},
-    {"id":"TOOL-002","function":"calculatePriority","input":{"impact":"High","urgency":"Medium"},"expected":{"result":"P2"}},
-    {"id":"TOOL-003","function":"calculatePriority","input":{"impact":"High","urgency":"Low"},"expected":{"result":"P2"}},
-    {"id":"TOOL-004","function":"calculatePriority","input":{"impact":"Medium","urgency":"High"},"expected":{"result":"P2"}},
-    {"id":"TOOL-005","function":"calculatePriority","input":{"impact":"Medium","urgency":"Medium"},"expected":{"result":"P3"}},
-    {"id":"TOOL-006","function":"calculatePriority","input":{"impact":"Medium","urgency":"Low"},"expected":{"result":"P3"}},
-    {"id":"TOOL-007","function":"calculatePriority","input":{"impact":"Low","urgency":"High"},"expected":{"result":"P3"}},
-    {"id":"TOOL-008","function":"calculatePriority","input":{"impact":"Low","urgency":"Medium"},"expected":{"result":"P4"}},
-    {"id":"TOOL-009","function":"calculatePriority","input":{"impact":"Low","urgency":"Low"},"expected":{"result":"P4"}},
-    {"id":"TOOL-010","function":"calculatePriority","input":{"impact":"Invalid","urgency":"High"},"expected":{"result":"P4"}},
-    {"id":"TOOL-011","function":"calculatePriority","input":{"impact":"High","urgency":null},"expected":{"result":"P4"}},
+    {"id":"TOOL-001","function":"calculatePriority","input":{"impact":"high","urgency":"high"},"expected":{"result":"P1"}},
+    {"id":"TOOL-002","function":"calculatePriority","input":{"impact":"high","urgency":"medium"},"expected":{"result":"P2"}},
+    {"id":"TOOL-003","function":"calculatePriority","input":{"impact":"high","urgency":"low"},"expected":{"result":"P2"}},
+    {"id":"TOOL-004","function":"calculatePriority","input":{"impact":"medium","urgency":"high"},"expected":{"result":"P2"}},
+    {"id":"TOOL-005","function":"calculatePriority","input":{"impact":"medium","urgency":"medium"},"expected":{"result":"P3"}},
+    {"id":"TOOL-006","function":"calculatePriority","input":{"impact":"medium","urgency":"low"},"expected":{"result":"P3"}},
+    {"id":"TOOL-007","function":"calculatePriority","input":{"impact":"low","urgency":"high"},"expected":{"result":"P3"}},
+    {"id":"TOOL-008","function":"calculatePriority","input":{"impact":"low","urgency":"medium"},"expected":{"result":"P4"}},
+    {"id":"TOOL-009","function":"calculatePriority","input":{"impact":"low","urgency":"low"},"expected":{"result":"P4"}},
+    {"id":"TOOL-010","function":"calculatePriority","input":{"impact":"invalid","urgency":"high"},"expected":{"result":"P4"}},
+    {"id":"TOOL-011","function":"calculatePriority","input":{"impact":"high","urgency":null},"expected":{"result":"P4"}},
 
     {"id":"TOOL-012","function":"calculateSLA","input":{"priority":"P1"},"expected":{"result":"4 Hours"}},
     {"id":"TOOL-013","function":"calculateSLA","input":{"priority":"P2"},"expected":{"result":"8 Hours"}},
@@ -20,13 +20,13 @@
     {"id":"TOOL-015","function":"calculateSLA","input":{"priority":"P4"},"expected":{"result":"48 Hours"}},
     {"id":"TOOL-016","function":"calculateSLA","input":{"priority":"PX"},"expected":{"result":"48 Hours"}},
 
-    {"id":"TOOL-017","function":"getEscalationTeam","input":{"priority":"P1","category":"Billing"},"expected":{"result":"Critical Incident Team"}},
-    {"id":"TOOL-018","function":"getEscalationTeam","input":{"priority":"P2","category":"Technical"},"expected":{"result":"Technical Support Team"}},
-    {"id":"TOOL-019","function":"getEscalationTeam","input":{"priority":"P2","category":"Account"},"expected":{"result":"Account Support Team"}},
-    {"id":"TOOL-020","function":"getEscalationTeam","input":{"priority":"P2","category":"Billing"},"expected":{"result":"Billing Team"}},
-    {"id":"TOOL-021","function":"getEscalationTeam","input":{"priority":"P2","category":"Bug"},"expected":{"result":"Engineering Team"}},
-    {"id":"TOOL-022","function":"getEscalationTeam","input":{"priority":"P3","category":"Feature Request"},"expected":{"result":"Product Team"}},
-    {"id":"TOOL-023","function":"getEscalationTeam","input":{"priority":"P3","category":"General"},"expected":{"result":"Support Team"}},
-    {"id":"TOOL-024","function":"getEscalationTeam","input":{"priority":"P3","category":"Unknown"},"expected":{"result":"Support Team"}}
+    {"id":"TOOL-017","function":"getEscalationTeam","input":{"priority":"P1","category":"billing"},"expected":{"result":"Critical Incident Team"}},
+    {"id":"TOOL-018","function":"getEscalationTeam","input":{"priority":"P2","category":"technical_issue"},"expected":{"result":"Technical Support Team"}},
+    {"id":"TOOL-019","function":"getEscalationTeam","input":{"priority":"P2","category":"account_access"},"expected":{"result":"Account Support Team"}},
+    {"id":"TOOL-020","function":"getEscalationTeam","input":{"priority":"P2","category":"billing"},"expected":{"result":"Billing Team"}},
+    {"id":"TOOL-021","function":"getEscalationTeam","input":{"priority":"P2","category":"product_question"},"expected":{"result":"Support Team"}},
+    {"id":"TOOL-022","function":"getEscalationTeam","input":{"priority":"P3","category":"product_question"},"expected":{"result":"Product Team"}},
+    {"id":"TOOL-023","function":"getEscalationTeam","input":{"priority":"P3","category":"security"},"expected":{"result":"Support Team"}},
+    {"id":"TOOL-024","function":"getEscalationTeam","input":{"priority":"P3","category":"other"},"expected":{"result":"Support Team"}}
   ]
 }

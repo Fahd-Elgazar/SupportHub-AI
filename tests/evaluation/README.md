@@ -12,12 +12,15 @@ This evaluation suite validates the current backend against its implemented API 
 
 ## Important alignment decision
 
-The suite uses the backend's current exact values:
+The suite uses the backend's current exact values, confirmed by live execution against `config/taxonomy.js`, `schemas/supportResponse.schema.js`, and a running server (see `evaluation-evidence.md`):
 
-- categories: `Technical`, `Billing`, `Account`, `General`, `Bug`, `Feature Request`
-- impact and urgency: `Low`, `Medium`, `High`
-- statuses: `Open`, `Pending`, `Escalated`, `Resolved`
+- categories: `account_access`, `technical_issue`, `billing`, `product_question`, `security`, `service_outage`, `other`
+- impact and urgency: `low`, `medium`, `high`
+- statuses: `Open`, `In Progress`, `Resolved`, `Closed`
 - SLA values: `4 Hours`, `8 Hours`, `24 Hours`, `48 Hours`
+- feedback request body: `{ ticket_id, rating, comment }`
+
+An earlier version of this suite used a different, Title-case set of these same values. That set matched `tools/escalationTool.js` only — every other part of the backend used the values above the whole time. See `docs/integration-issues.md` for how that was found and corrected.
 
 ## Running backend tests
 
