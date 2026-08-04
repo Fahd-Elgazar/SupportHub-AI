@@ -6,6 +6,7 @@ import ResultView from "./components/ResultView";
 import TicketQueue from "./components/TicketQueue";
 import TicketDetail from "./components/TicketDetail";
 import { FailedState, LoadingState } from "./components/States";
+import logo from "./assets/logo.png";
 
 export default function App() {
   const [activeView, setActiveView] = useState<"ask" | "queue">("ask");
@@ -28,8 +29,7 @@ export default function App() {
 
       <header className="appbar">
         <div className="mark">
-          <i />
-          SupportHub
+          <img src={logo} alt="SupportHub AI" className="mark-logo" />
         </div>
         <nav className="nav" aria-label="Main">
           <a
