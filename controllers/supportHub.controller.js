@@ -13,9 +13,7 @@ exports.askSupport = async (req, res, next) => {
   try {
     const { question } = req.body;
 
-    const ticket = await supportHubService.generateSupportResponse(question);
-
-    const savedTicket = await ticketModel.createTicket(ticket);
+    const savedTicket = await supportHubService.generateSupportResponse(question);
 
     return res.status(200).json({
       success: true,

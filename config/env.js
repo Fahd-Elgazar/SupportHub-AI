@@ -21,6 +21,9 @@ module.exports = {
   MAX_INPUT_LENGTH:
     Number(process.env.MAX_INPUT_LENGTH) || 2000,
 
+  CORS_ORIGIN:
+    process.env.CORS_ORIGIN || "http://localhost:5173",
+
   GROQ_API_KEY:
     process.env.GROQ_API_KEY,
 

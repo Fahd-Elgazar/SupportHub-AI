@@ -1,7 +1,9 @@
 require("dotenv").config();
 
 const express = require("express");
+const cors = require("cors");
 
+const env = require("./config/env");
 const logger = require("./middleware/logger");
 const errorHandler = require("./middleware/errorHandler");
 
@@ -12,6 +14,14 @@ const app = express();
 // ===========================
 // Middleware
 // ===========================
+
+const allowedOrigins = env.CORS_ORIGIN.split(",").map((origin) => origin.trim());
+
+app.use(
+  cors({
+    origin: allowedOrigins,
+  })
+);
 
 app.use(express.json());
 

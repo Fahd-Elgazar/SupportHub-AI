@@ -1,21 +1,21 @@
 const calculatePriority = (impact, urgency) => {
   const matrix = {
-    High: {
-      High: "P1",
-      Medium: "P2",
-      Low: "P2",
+    high: {
+      high: "P1",
+      medium: "P2",
+      low: "P2",
     },
 
-    Medium: {
-      High: "P2",
-      Medium: "P3",
-      Low: "P3",
+    medium: {
+      high: "P2",
+      medium: "P3",
+      low: "P3",
     },
 
-    Low: {
-      High: "P3",
-      Medium: "P4",
-      Low: "P4",
+    low: {
+      high: "P3",
+      medium: "P4",
+      low: "P4",
     },
   };
 

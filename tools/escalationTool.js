@@ -1,21 +1,18 @@
- const getEscalationTeam = (priority, category) => {
+const getEscalationTeam = (priority, category) => {
   if (priority === "P1") {
     return "Critical Incident Team";
   }
 
   if (priority === "P2") {
     switch (category) {
-      case "Technical":
+      case "technical_issue":
         return "Technical Support Team";
 
-      case "Account":
+      case "account_access":
         return "Account Support Team";
 
-      case "Billing":
+      case "billing":
         return "Billing Team";
-
-      case "Bug":
-        return "Engineering Team";
 
       default:
         return "Support Team";
@@ -23,20 +20,17 @@
   }
 
   switch (category) {
-    case "Technical":
+    case "technical_issue":
       return "Technical Support Team";
 
-    case "Billing":
+    case "billing":
       return "Billing Team";
 
-    case "Account":
+    case "account_access":
       return "Account Support Team";
 
-    case "Feature Request":
+    case "product_question":
       return "Product Team";
-
-    case "Bug":
-      return "Engineering Team";
 
     default:
       return "Support Team";
