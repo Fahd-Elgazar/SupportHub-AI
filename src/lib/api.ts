@@ -134,12 +134,18 @@ export async function submitFeedback(input: FeedbackRequest): Promise<boolean> {
     await delay(400);
     return true;
   }
-  const res = await request("/feedback", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(input),
-  });
-  return res.status === 201;
+  try {
+    const res = await request("/feedback", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(input),
+    });
+    return res.status === 201;
+  } catch {
+    // Network failure, timeout, or CORS rejection — same treatment as the
+    // other endpoints: a caught failure, not an unhandled rejection.
+    return false;
+  }
 }
 
 export const usingMockData = USE_MOCK;

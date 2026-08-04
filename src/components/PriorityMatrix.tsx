@@ -105,8 +105,9 @@ export default function PriorityMatrix({
         {mismatch && (
           <p className="matrix-flag" role="status">
             The server returned {priority}, but this pairing should give{" "}
-            {expected}. Known backend bug — <code>priorityTool.js</code>{" "}
-            compares capitalised levels against lowercase ones.
+            {expected}. That means <code>tools/priorityTool.js</code> and this
+            matrix have drifted apart — treat the server value as suspect
+            until that's investigated.
           </p>
         )}
       </div>

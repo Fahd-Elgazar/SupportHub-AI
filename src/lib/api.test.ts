@@ -25,7 +25,11 @@ const SAMPLE_TICKET: Ticket = {
   status: "Open",
 };
 
-describe("getTicket — mock mode (VITE_USE_MOCK=true, the project default)", () => {
+describe("getTicket — mock mode (VITE_USE_MOCK=true)", () => {
+  beforeEach(() => {
+    vi.stubEnv("VITE_USE_MOCK", "true");
+  });
+
   it("finds an existing mock fixture by id", async () => {
     const { getTicket } = await import("../lib/api");
     const result = await getTicket(147); // MOCK_OUTAGE's id

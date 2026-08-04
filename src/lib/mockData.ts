@@ -5,9 +5,8 @@ import type { Ticket } from "../types/ticket";
  * it is pointed at the real API — that is the order the handbook asks for,
  * and it means the UI can be demonstrated even when the provider is down.
  *
- * Note: `priority` here shows what calculate_priority_sla() *should* return
- * for each impact/urgency pair. The current backend returns P4 for everything
- * because priorityTool.js compares "High" against "high". Reported to Alaa.
+ * `priority` here matches what calculate_priority_sla() actually returns
+ * for each impact/urgency pair.
  */
 
 export const MOCK_BILLING: Ticket = {

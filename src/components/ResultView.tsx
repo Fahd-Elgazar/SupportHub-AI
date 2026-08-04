@@ -227,6 +227,7 @@ function FeedbackForm({ ticketId }: { ticketId: number }) {
   const [rating, setRating] = useState<(typeof RATINGS)[number] | null>(null);
   const [comment, setComment] = useState("");
   const [sent, setSent] = useState(false);
+  const [sending, setSending] = useState(false);
   const [failed, setFailed] = useState(false);
   const id = useId();
 
@@ -234,6 +235,7 @@ function FeedbackForm({ ticketId }: { ticketId: number }) {
     setRating(null);
     setComment("");
     setSent(false);
+    setSending(false);
     setFailed(false);
   }, [ticketId]);
 
@@ -247,12 +249,15 @@ function FeedbackForm({ ticketId }: { ticketId: number }) {
   }
 
   async function send() {
-    if (rating === null) return;
+    if (rating === null || sending) return;
+    setSending(true);
+    setFailed(false);
     const ok = await submitFeedback({
       ticket_id: ticketId,
       rating,
       comment: comment.trim() || undefined,
     });
+    setSending(false);
     if (ok) setSent(true);
     else setFailed(true);
   }
@@ -294,10 +299,10 @@ function FeedbackForm({ ticketId }: { ticketId: number }) {
         <button
           className="btn"
           type="button"
-          disabled={rating === null}
+          disabled={rating === null || sending}
           onClick={send}
         >
-          Submit feedback
+          {sending ? "Submitting…" : "Submit feedback"}
         </button>
         <span className="count">ticket_id {ticketId}</span>
       </div>
