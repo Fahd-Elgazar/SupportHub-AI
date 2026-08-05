@@ -1,5 +1,14 @@
 import { useEffect, useId, useState } from "react";
 import { motion } from "framer-motion";
+import {
+  Sparkles,
+  BookOpenCheck,
+  Calculator,
+  Info,
+  UserCog,
+  MessageSquareHeart,
+  Loader2,
+} from "lucide-react";
 import type { Ticket, TicketStatus } from "../types/ticket";
 import { categoryLabel, levelLabel } from "../lib/labels";
 import {
@@ -75,7 +84,10 @@ export default function ResultView({ ticket, mode, onTicketChange }: ResultViewP
           <CalculatedZone ticket={liveTicket} />
 
           <div className="section-block">
-            <p className="section-label">Agent actions</p>
+            <p className="section-label">
+              <UserCog size={14} className="section-icon" aria-hidden="true" />
+              Agent actions
+            </p>
             <StatusActions
               ticket={liveTicket}
               grounded={grounded}
@@ -87,7 +99,10 @@ export default function ResultView({ ticket, mode, onTicketChange }: ResultViewP
           </div>
 
           <div className="section-block">
-            <p className="section-label">Knowledge feedback</p>
+            <p className="section-label">
+              <MessageSquareHeart size={14} className="section-icon" aria-hidden="true" />
+              Knowledge feedback
+            </p>
             <FeedbackForm ticketId={liveTicket.id} />
           </div>
         </>
@@ -109,7 +124,7 @@ function GeneratedZone({ answer }: { answer: string }) {
   return (
     <div className="zone z-gen">
       <div className="zone-tag">
-        <span className="dot" />
+        <Sparkles size={14} className="zone-icon" aria-hidden="true" />
         Generated · model answer
       </div>
       {answer.split("\n\n").map((para, i) => (
@@ -122,7 +137,7 @@ function GeneratedZone({ answer }: { answer: string }) {
 function UnsupportedNotice({ team }: { team: string }) {
   return (
     <div className="alert warn" role="status">
-      <span className="ic">?</span>
+      <Info size={18} className="ic" aria-hidden="true" />
       <div>
         <strong>Nothing in the approved documentation covers this.</strong>
         No answer has been drafted. The ticket has still been categorised and
@@ -137,7 +152,7 @@ function EvidenceZone({ sources }: { sources: string[] }) {
     return (
       <div className="zone z-src empty-src">
         <div className="zone-tag">
-          <span className="dot" />
+          <BookOpenCheck size={14} className="zone-icon" aria-hidden="true" />
           Evidence · none
         </div>
         <p className="quiet">
@@ -150,7 +165,7 @@ function EvidenceZone({ sources }: { sources: string[] }) {
   return (
     <div className="zone z-src">
       <div className="zone-tag">
-        <span className="dot" />
+        <BookOpenCheck size={14} className="zone-icon" aria-hidden="true" />
         Evidence · {sources.length} approved{" "}
         {sources.length === 1 ? "source" : "sources"}
       </div>
@@ -170,7 +185,7 @@ function CalculatedZone({ ticket }: { ticket: Ticket }) {
   return (
     <div className="zone z-calc">
       <div className="zone-tag">
-        <span className="dot" />
+        <Calculator size={14} className="zone-icon" aria-hidden="true" />
         Calculated · deterministic tools
       </div>
 
@@ -433,7 +448,12 @@ function FeedbackForm({ ticketId }: { ticketId: number }) {
   }, [ticketId]);
 
   if (checking) {
-    return <p className="quiet">Checking for existing feedback…</p>;
+    return (
+      <p className="quiet">
+        <Loader2 size={14} className="spin" aria-hidden="true" />
+        Checking for existing feedback…
+      </p>
+    );
   }
 
   if (sent) {

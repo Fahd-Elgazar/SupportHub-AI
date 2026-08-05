@@ -1,10 +1,31 @@
 import { useState } from "react";
+import {
+  ShieldCheck,
+  Gauge,
+  Route,
+  FileEdit,
+  Sparkles,
+  MessageSquareText,
+  Lightbulb,
+} from "lucide-react";
 
 const CAPABILITIES = [
-  "Answers grounded only in approved documentation — never invented",
-  "Impact, urgency, priority and SLA calculated by deterministic rules",
-  "Automatic ticket categorisation and escalation-team routing",
-  "A ready-to-edit reply drafted alongside every triage",
+  {
+    icon: ShieldCheck,
+    text: "Answers grounded only in approved documentation — never invented",
+  },
+  {
+    icon: Gauge,
+    text: "Impact, urgency, priority and SLA calculated by deterministic rules",
+  },
+  {
+    icon: Route,
+    text: "Automatic ticket categorisation and escalation-team routing",
+  },
+  {
+    icon: FileEdit,
+    text: "A ready-to-edit reply drafted alongside every triage",
+  },
 ];
 
 const EXAMPLES = [
@@ -19,16 +40,27 @@ export default function AskInfoPanel() {
   return (
     <aside className="card ask-info" aria-label="About asking a question">
       <section>
-        <h3>What this does</h3>
+        <h3>
+          <Sparkles size={15} className="ask-info-icon" aria-hidden="true" />
+          What this does
+        </h3>
+        <p className="section-desc">Four things happen automatically on every question.</p>
         <ul className="cap-list">
-          {CAPABILITIES.map((c) => (
-            <li key={c}>{c}</li>
+          {CAPABILITIES.map(({ icon: Icon, text }) => (
+            <li key={text}>
+              <Icon size={14} className="cap-icon" aria-hidden="true" />
+              <span>{text}</span>
+            </li>
           ))}
         </ul>
       </section>
 
       <section>
-        <h3>Try an example</h3>
+        <h3>
+          <MessageSquareText size={15} className="ask-info-icon" aria-hidden="true" />
+          Try an example
+        </h3>
+        <p className="section-desc">Copy one straight into the form on the left.</p>
         <ul className="example-list">
           {EXAMPLES.map((q) => (
             <ExampleRow key={q} question={q} />
@@ -37,7 +69,10 @@ export default function AskInfoPanel() {
       </section>
 
       <section>
-        <h3>Getting a good answer</h3>
+        <h3>
+          <Lightbulb size={15} className="ask-info-icon" aria-hidden="true" />
+          Getting a good answer
+        </h3>
         <p className="hint">
           Paste the customer&rsquo;s message as close to verbatim as
           possible. More context (what they&rsquo;ve already tried, what

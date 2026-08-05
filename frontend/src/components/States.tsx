@@ -1,3 +1,5 @@
+import { AlertTriangle, Inbox, Sparkles, Calculator } from "lucide-react";
+
 /** Loading, failure and empty states. Each one is a screen an agent can act from. */
 
 export function LoadingState() {
@@ -9,7 +11,7 @@ export function LoadingState() {
 
       <div className="zone z-gen">
         <div className="zone-tag">
-          <span className="dot" />
+          <Sparkles size={14} className="zone-icon" aria-hidden="true" />
           Generated
         </div>
         <div className="sk line" style={{ width: "94%" }} />
@@ -19,7 +21,7 @@ export function LoadingState() {
 
       <div className="zone z-calc">
         <div className="zone-tag">
-          <span className="dot" />
+          <Calculator size={14} className="zone-icon" aria-hidden="true" />
           Calculated
         </div>
         <dl className="kv">
@@ -53,7 +55,7 @@ export function FailedState({
   return (
     <section role="alert">
       <div className="alert err">
-        <span className="ic">!</span>
+        <AlertTriangle size={18} className="ic" aria-hidden="true" />
         <div>
           <strong>The answer service didn&rsquo;t respond.</strong>
           {message}
@@ -80,6 +82,7 @@ export function FailedState({
 export function EmptyState({ onAsk }: { onAsk: () => void }) {
   return (
     <div className="empty">
+      <Inbox size={28} className="empty-icon" aria-hidden="true" />
       <h3>No tickets in the queue</h3>
       <p>
         Nothing has been triaged yet. Ask a support question and it&rsquo;ll

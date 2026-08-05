@@ -4,6 +4,8 @@ import { PRIORITIES, STATUSES } from "../types/ticket";
 import { categoryLabel } from "../lib/labels";
 import { getTickets } from "../lib/api";
 import { EmptyState } from "./States";
+import QueueStats from "./QueueStats";
+import { AlertTriangle, SearchX } from "lucide-react";
 
 type QueueState =
   | { kind: "loading" }
@@ -100,7 +102,7 @@ export default function TicketQueue({
         <h2>Ticket queue</h2>
         <section role="alert">
           <div className="alert err">
-            <span className="ic">!</span>
+            <AlertTriangle size={18} className="ic" aria-hidden="true" />
             <div>
               <strong>Could not load the queue.</strong>
               {state.message}
@@ -128,6 +130,8 @@ export default function TicketQueue({
   return (
     <>
       <h2>Ticket queue</h2>
+
+      <QueueStats tickets={sorted} />
 
       <div className="queue-filters">
         <fieldset>
@@ -172,6 +176,7 @@ export default function TicketQueue({
 
         {filtered.length === 0 ? (
           <div className="empty">
+            <SearchX size={28} className="empty-icon" aria-hidden="true" />
             <h3>No tickets match these filters</h3>
             <p>Try a different combination, or clear the filters to see the full queue.</p>
             <button

@@ -5,6 +5,7 @@ import { askSupport, usingMockData } from "./lib/api";
 import AskForm from "./components/AskForm";
 import AskInfoPanel from "./components/AskInfoPanel";
 import Hero from "./components/Hero";
+import TriageSteps from "./components/TriageSteps";
 import ResultView from "./components/ResultView";
 import TicketQueue from "./components/TicketQueue";
 import TicketDetail from "./components/TicketDetail";
@@ -105,6 +106,10 @@ export default function App() {
                         onRetry={() => ask(lastQuestion)}
                         onFileManually={() => setState({ kind: "idle" })}
                       />
+                    )}
+
+                    {state.kind !== "loading" && state.kind !== "failed" && (
+                      <TriageSteps />
                     )}
                   </div>
 
