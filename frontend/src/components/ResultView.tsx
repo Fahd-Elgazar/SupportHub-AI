@@ -57,7 +57,7 @@ export default function ResultView({ ticket, mode, onTicketChange }: ResultViewP
             {liveTicket.priority} · {liveTicket.sla}
           </span>
         )}
-        <span className="count push">status: {liveTicket.status}</span>
+        <span className="badge b-plain push">{liveTicket.status}</span>
       </header>
       <p className="asked">&ldquo;{liveTicket.question}&rdquo;</p>
 
@@ -72,15 +72,23 @@ export default function ResultView({ ticket, mode, onTicketChange }: ResultViewP
       {isAgent ? (
         <>
           <CalculatedZone ticket={liveTicket} />
-          <StatusActions
-            ticket={liveTicket}
-            grounded={grounded}
-            onStatusChange={handleStatusChange}
-          />
-          {grounded && (
-            <ReplyEditor ticket={liveTicket} onStatusChange={handleStatusChange} />
-          )}
-          <FeedbackForm ticketId={liveTicket.id} />
+
+          <div className="section-block">
+            <p className="section-label">Agent actions</p>
+            <StatusActions
+              ticket={liveTicket}
+              grounded={grounded}
+              onStatusChange={handleStatusChange}
+            />
+            {grounded && (
+              <ReplyEditor ticket={liveTicket} onStatusChange={handleStatusChange} />
+            )}
+          </div>
+
+          <div className="section-block">
+            <p className="section-label">Knowledge feedback</p>
+            <FeedbackForm ticketId={liveTicket.id} />
+          </div>
         </>
       ) : (
         <p className="saved">

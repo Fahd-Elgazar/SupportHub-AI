@@ -55,9 +55,7 @@ export default function App() {
             Queue
           </a>
         </nav>
-        <span className="who">
-          {usingMockData ? "mock data · no server" : "connected"}
-        </span>
+        {usingMockData && <span className="who">Mock data · no server</span>}
       </header>
 
       <main id="main" className="wrap">
@@ -115,10 +113,13 @@ export default function App() {
       </main>
 
       <footer className="foot">
-        <p>
-          Team 09 · SupportHub AI · UI &amp; workflow owned by Jana Mohamed
-          Hasabo
+        <p className="foot-name">SupportHub AI</p>
+        <p className="foot-desc">
+          AI-assisted internal support platform for intelligent ticket
+          triage, knowledge-grounded responses, and deterministic priority
+          classification.
         </p>
+        <p className="foot-copy">&copy; 2026 SupportHub AI</p>
       </footer>
     </>
   );
