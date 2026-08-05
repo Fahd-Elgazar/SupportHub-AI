@@ -1,4 +1,5 @@
 import { useEffect, useId, useState } from "react";
+import { motion } from "framer-motion";
 import type { Ticket, TicketStatus } from "../types/ticket";
 import { categoryLabel, levelLabel } from "../lib/labels";
 import {
@@ -367,9 +368,15 @@ function ReplyEditor({
       </div>
 
       {alreadySent ? (
-        <p className="sent" role="status">
+        <motion.p
+          className="sent"
+          role="status"
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.25, ease: "easeOut" }}
+        >
           Reply sent successfully (simulated). Ticket marked {ticket.status}.
-        </p>
+        </motion.p>
       ) : (
         <div className="f-foot">
           <button className="btn" type="button" disabled={sending} onClick={sendReply}>
@@ -431,11 +438,17 @@ function FeedbackForm({ ticketId }: { ticketId: number }) {
 
   if (sent) {
     return (
-      <p className="sent" role="status">
+      <motion.p
+        className="sent"
+        role="status"
+        initial={{ opacity: 0, y: 6 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.25, ease: "easeOut" }}
+      >
         Feedback recorded — rated {rating}/5
         {existingComment && <>: &ldquo;{existingComment}&rdquo;</>}. Thanks —
         it tells the knowledge team which documentation is working.
-      </p>
+      </motion.p>
     );
   }
 

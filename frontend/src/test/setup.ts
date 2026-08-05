@@ -5,3 +5,17 @@ import { cleanup } from "@testing-library/react";
 afterEach(() => {
   cleanup();
 });
+
+// jsdom has no matchMedia; framer-motion's reduced-motion check needs it.
+if (!window.matchMedia) {
+  window.matchMedia = (query: string) => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: () => {},
+    removeListener: () => {},
+    addEventListener: () => {},
+    removeEventListener: () => {},
+    dispatchEvent: () => false,
+  }) as unknown as MediaQueryList;
+}

@@ -1,19 +1,37 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { AnimatePresence, motion, MotionConfig } from "framer-motion";
 import type { RequestState } from "./types/ticket";
 import { askSupport, usingMockData } from "./lib/api";
 import AskForm from "./components/AskForm";
+import AskInfoPanel from "./components/AskInfoPanel";
+import Hero from "./components/Hero";
 import ResultView from "./components/ResultView";
 import TicketQueue from "./components/TicketQueue";
 import TicketDetail from "./components/TicketDetail";
+import SplashScreen from "./components/SplashScreen";
 import { FailedState, LoadingState } from "./components/States";
 import logo from "./assets/logo.png";
 
+/** Fade/slide used for the few top-level view swaps — subtle, not a full page transition library. */
+const fade = {
+  initial: { opacity: 0, y: 8 },
+  animate: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: -8 },
+  transition: { duration: 0.22, ease: "easeOut" as const },
+};
+
 export default function App() {
+  const [booting, setBooting] = useState(true);
   const [activeView, setActiveView] = useState<"ask" | "queue">("ask");
   const [selectedTicketId, setSelectedTicketId] = useState<number | null>(null);
   const [state, setState] = useState<RequestState>({ kind: "idle" });
   /** Kept separately so a failure never costs the agent their typed question. */
   const [lastQuestion, setLastQuestion] = useState("");
+
+  useEffect(() => {
+    const timer = setTimeout(() => setBooting(false), 1050);
+    return () => clearTimeout(timer);
+  }, []);
 
   const ask = useCallback(async (question: string) => {
     setLastQuestion(question);
@@ -21,8 +39,12 @@ export default function App() {
     setState(await askSupport(question));
   }, []);
 
+  const composing = state.kind !== "success";
+
   return (
-    <>
+    <MotionConfig reducedMotion="user">
+      <AnimatePresence>{booting && <SplashScreen />}</AnimatePresence>
+
       <a className="skip" href="#main">
         Skip to main content
       </a>
@@ -60,55 +82,74 @@ export default function App() {
 
       <main id="main" className="wrap">
         {activeView === "ask" ? (
-          <>
-            {state.kind === "success" ? (
-              // The input phase is over — collapse the form so the result
-              // owns the screen, rather than letting the page grow forever
-              // underneath a textarea that's no longer the point.
-              <div className="f-foot">
-                <button
-                  className="btn ghost"
-                  type="button"
-                  onClick={() => setState({ kind: "idle" })}
-                >
-                  ← Ask another question
-                </button>
-              </div>
+          <AnimatePresence mode="wait">
+            {composing ? (
+              <motion.div key="composing" {...fade}>
+                <Hero />
+                <div className="ask-columns">
+                  <div className="card ask-form-col">
+                    <AskForm
+                      onSubmit={ask}
+                      loading={state.kind === "loading"}
+                      serverErrors={state.kind === "invalid" ? state.errors : undefined}
+                      initialValue={lastQuestion}
+                      key={state.kind === "idle" ? "fresh" : "kept"}
+                    />
+
+                    {state.kind === "loading" && <LoadingState />}
+
+                    {state.kind === "failed" && (
+                      <FailedState
+                        message={state.message}
+                        question={lastQuestion}
+                        onRetry={() => ask(lastQuestion)}
+                        onFileManually={() => setState({ kind: "idle" })}
+                      />
+                    )}
+                  </div>
+
+                  <AskInfoPanel />
+                </div>
+              </motion.div>
             ) : (
-              <AskForm
-                onSubmit={ask}
-                loading={state.kind === "loading"}
-                serverErrors={state.kind === "invalid" ? state.errors : undefined}
-                initialValue={lastQuestion}
-                key={state.kind === "idle" ? "fresh" : "kept"}
-              />
-            )}
+              <motion.div key="result" className="card" {...fade}>
+                {/* The input phase is over — collapse the form so the result
+                    owns the screen, rather than letting the page grow forever
+                    underneath a textarea that's no longer the point. */}
+                <div className="f-foot">
+                  <button
+                    className="btn ghost"
+                    type="button"
+                    onClick={() => setState({ kind: "idle" })}
+                  >
+                    ← Ask another question
+                  </button>
+                </div>
 
-            {state.kind === "loading" && <LoadingState />}
-
-            {state.kind === "success" && (
-              <ResultView ticket={state.ticket} mode="customer" />
+                {state.kind === "success" && (
+                  <ResultView ticket={state.ticket} mode="customer" />
+                )}
+              </motion.div>
             )}
-
-            {state.kind === "failed" && (
-              <FailedState
-                message={state.message}
-                question={lastQuestion}
-                onRetry={() => ask(lastQuestion)}
-                onFileManually={() => setState({ kind: "idle" })}
-              />
-            )}
-          </>
-        ) : selectedTicketId !== null ? (
-          <TicketDetail
-            id={selectedTicketId}
-            onBack={() => setSelectedTicketId(null)}
-          />
+          </AnimatePresence>
         ) : (
-          <TicketQueue
-            onAsk={() => setActiveView("ask")}
-            onSelectTicket={setSelectedTicketId}
-          />
+          <AnimatePresence mode="wait">
+            {selectedTicketId !== null ? (
+              <motion.div key={`ticket-${selectedTicketId}`} className="card" {...fade}>
+                <TicketDetail
+                  id={selectedTicketId}
+                  onBack={() => setSelectedTicketId(null)}
+                />
+              </motion.div>
+            ) : (
+              <motion.div key="queue" className="card" {...fade}>
+                <TicketQueue
+                  onAsk={() => setActiveView("ask")}
+                  onSelectTicket={setSelectedTicketId}
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
         )}
       </main>
 
@@ -121,6 +162,6 @@ export default function App() {
         </p>
         <p className="foot-copy">&copy; 2026 SupportHub AI</p>
       </footer>
-    </>
+    </MotionConfig>
   );
 }
