@@ -107,6 +107,45 @@ describe("SupportHub API", () => {
 
         });
 
+        test("should save the reply alongside the status when provided", async () => {
+
+            const response = await request(app)
+                .patch("/api/supporthub-ai/ticket/1/status")
+                .send({
+
+                    status:"Resolved",
+
+                    reply:"Here is the reply that was actually sent."
+
+                });
+
+            expect([200,404]).toContain(response.statusCode);
+
+            if (response.statusCode === 200) {
+
+                expect(response.body.data.suggested_reply)
+                    .toBe("Here is the reply that was actually sent.");
+
+            }
+
+        });
+
+    });
+
+    describe("GET Feedback For Ticket", () => {
+
+        test("should return feedback for a ticket as an array", async () => {
+
+            const response = await request(app)
+                .get("/api/supporthub-ai/ticket/1/feedback");
+
+            expect(response.statusCode).toBe(200);
+
+            expect(Array.isArray(response.body.data))
+                .toBe(true);
+
+        });
+
     });
 
     describe("POST Feedback", () => {

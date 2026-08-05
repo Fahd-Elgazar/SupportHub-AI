@@ -101,7 +101,8 @@ exports.updateTicketStatus = async (req, res, next) => {
   try {
     const ticket = await ticketModel.updateTicketStatus(
       req.params.id,
-      req.body.status
+      req.body.status,
+      req.body.reply
     );
 
     if (!ticket) {
@@ -130,6 +131,26 @@ exports.updateTicketStatus = async (req, res, next) => {
 exports.getFeedback = async (req, res, next) => {
   try {
     const feedback = await feedbackModel.getAllFeedback();
+
+    return res.status(200).json({
+      success: true,
+      count: feedback.length,
+      data: feedback,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/*
+|--------------------------------------------------------------------------
+| Get Feedback For One Ticket
+|--------------------------------------------------------------------------
+*/
+
+exports.getFeedbackByTicket = async (req, res, next) => {
+  try {
+    const feedback = await feedbackModel.getFeedbackByTicket(req.params.id);
 
     return res.status(200).json({
       success: true,

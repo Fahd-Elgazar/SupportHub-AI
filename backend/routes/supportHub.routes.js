@@ -56,6 +56,11 @@ router.patch(
   controller.updateTicketStatus
 );
 
+router.get(
+  "/ticket/:id/feedback",
+  controller.getFeedbackByTicket
+);
+
 /*
 |--------------------------------------------------------------------------
 | Feedback

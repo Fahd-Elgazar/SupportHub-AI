@@ -65,7 +65,27 @@ const getTicketById = async (id) => {
   return result.rows[0];
 };
 
-const updateTicketStatus = async (id, status) => {
+/**
+ * `reply` is optional — set alongside status when an agent sends their
+ * edited reply (the reply itself is stored in the existing suggested_reply
+ * column; there's no separate "sent reply" field, so this overwrites it
+ * with whatever was actually sent).
+ */
+const updateTicketStatus = async (id, status, reply) => {
+  if (reply !== undefined) {
+    const result = await db.query(
+      `
+      UPDATE tickets
+      SET status = $1, suggested_reply = $2
+      WHERE id = $3
+      RETURNING *
+      `,
+      [status, reply, id]
+    );
+
+    return result.rows[0];
+  }
+
   const result = await db.query(
     `
     UPDATE tickets

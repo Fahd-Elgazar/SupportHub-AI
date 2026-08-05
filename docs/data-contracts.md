@@ -108,7 +108,18 @@ Content-Type: application/json
 }
 ```
 
-`status` must be one of `Open`, `In Progress`, `Resolved`, `Closed`. This endpoint only changes the ticket's status column — it does not touch any other field. Used by the agent workspace (Ticket Detail) to move a ticket through its lifecycle, and by the "Escalate" action (which sets `In Progress`).
+`status` must be one of `Open`, `In Progress`, `Resolved`, `Closed`. Used by the agent workspace (Ticket Detail) to move a ticket through its lifecycle, and by the "Escalate" action (which sets `In Progress`).
+
+An optional `reply` field may be sent alongside `status`:
+
+```json
+{
+  "status": "Resolved",
+  "reply": "Here is the reply that was actually sent to the customer."
+}
+```
+
+When `reply` is present, it overwrites the ticket's `suggested_reply` column with the text the agent actually sent — there is no separate "sent reply" field, since the suggested reply is meant to become the sent reply once an agent has edited and sent it. Used by the "Send reply" action (which sets `Resolved`). Without `reply`, only `status` changes.
 
 ### Success response — 200
 
@@ -118,7 +129,7 @@ Content-Type: application/json
   "message": "Ticket status updated.",
   "data": {
     "id": 1,
-    "...": "...full ticket row, with the new status..."
+    "...": "...full ticket row, with the new status (and suggested_reply, if reply was sent)..."
   }
 }
 ```
@@ -132,7 +143,35 @@ Content-Type: application/json
 }
 ```
 
-## 4. Health check
+## 4. Get feedback for a ticket
+
+```http
+GET /api/supporthub-ai/ticket/:id/feedback
+```
+
+Returns any feedback already recorded for one ticket, most recent first. Used by the agent workspace to preload existing feedback on Ticket Detail, so re-opening a ticket that was already rated shows the prior rating instead of a blank form.
+
+### Success response — 200
+
+```json
+{
+  "success": true,
+  "count": 1,
+  "data": [
+    {
+      "id": 1,
+      "ticket_id": 1,
+      "rating": 5,
+      "comment": "Helpful response",
+      "created_at": "..."
+    }
+  ]
+}
+```
+
+`data` is an empty array if the ticket has no feedback yet — this is not a 404, since "no feedback exists" is a normal, expected state for a ticket.
+
+## 5. Health check
 
 ```http
 GET /api/supporthub-ai/health
@@ -148,7 +187,7 @@ GET /api/supporthub-ai/health
 }
 ```
 
-## 5. Version information
+## 6. Version information
 
 ```http
 GET /api/supporthub-ai/version
@@ -167,7 +206,7 @@ GET /api/supporthub-ai/version
 
 The provider value depends on environment configuration.
 
-## 6. Validate request only
+## 7. Validate request only
 
 ```http
 GET /api/supporthub-ai/validate
@@ -184,7 +223,7 @@ This is a `GET` route, not `POST`. It takes no body and does not read the reques
 }
 ```
 
-## 7. Unknown route
+## 8. Unknown route
 
 ### Response — 404
 

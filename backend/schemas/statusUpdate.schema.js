@@ -11,4 +11,10 @@ module.exports = Joi.object({
     )
     .required(),
 
+  /** Optional: set alongside status when an agent sends their edited reply. */
+  reply: Joi.string()
+    .trim()
+    .min(1)
+    .max(5000),
+
 });
