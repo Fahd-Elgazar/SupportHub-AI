@@ -63,17 +63,34 @@ export default function App() {
       <main id="main" className="wrap">
         {activeView === "ask" ? (
           <>
-            <AskForm
-              onSubmit={ask}
-              loading={state.kind === "loading"}
-              serverErrors={state.kind === "invalid" ? state.errors : undefined}
-              initialValue={lastQuestion}
-              key={state.kind === "idle" ? "fresh" : "kept"}
-            />
+            {state.kind === "success" ? (
+              // The input phase is over — collapse the form so the result
+              // owns the screen, rather than letting the page grow forever
+              // underneath a textarea that's no longer the point.
+              <div className="f-foot">
+                <button
+                  className="btn ghost"
+                  type="button"
+                  onClick={() => setState({ kind: "idle" })}
+                >
+                  ← Ask another question
+                </button>
+              </div>
+            ) : (
+              <AskForm
+                onSubmit={ask}
+                loading={state.kind === "loading"}
+                serverErrors={state.kind === "invalid" ? state.errors : undefined}
+                initialValue={lastQuestion}
+                key={state.kind === "idle" ? "fresh" : "kept"}
+              />
+            )}
 
             {state.kind === "loading" && <LoadingState />}
 
-            {state.kind === "success" && <ResultView ticket={state.ticket} />}
+            {state.kind === "success" && (
+              <ResultView ticket={state.ticket} mode="customer" />
+            )}
 
             {state.kind === "failed" && (
               <FailedState

@@ -39,7 +39,13 @@ export default function TicketDetail({
 
       {state.kind === "loading" && <LoadingState />}
 
-      {state.kind === "found" && <ResultView ticket={state.ticket} />}
+      {state.kind === "found" && (
+        <ResultView
+          ticket={state.ticket}
+          mode="agent"
+          onTicketChange={(ticket) => setState({ kind: "found", ticket })}
+        />
+      )}
 
       {state.kind === "not_found" && (
         <div className="empty">

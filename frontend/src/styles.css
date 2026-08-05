@@ -305,8 +305,11 @@ button.queue-row:focus-visible { outline: 2px solid var(--signal); outline-offse
   line-height: 1.5;
 }
 
-/* ---------- reply + feedback ---------- */
+/* ---------- status actions + reply + feedback ---------- */
 
+.status-actions {
+  margin-top: 20px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+}
 .reply, .feedback { margin-top: 30px; padding-top: 26px; border-top: 1px solid var(--line-soft); }
 .sent {
   margin-top: 26px; padding: 15px 17px; background: var(--signal-tint);

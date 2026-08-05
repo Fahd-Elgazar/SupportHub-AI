@@ -3,6 +3,7 @@ import type {
   FeedbackRequest,
   RequestState,
   Ticket,
+  TicketStatus,
 } from "../types/ticket";
 import { isValidationError } from "../types/ticket";
 import { pickMockTicket, MOCK_TICKETS } from "./mockData";
@@ -145,6 +146,35 @@ export async function submitFeedback(input: FeedbackRequest): Promise<boolean> {
     // Network failure, timeout, or CORS rejection — same treatment as the
     // other endpoints: a caught failure, not an unhandled rejection.
     return false;
+  }
+}
+
+/**
+ * PATCH /ticket/:id/status — moves a ticket through its lifecycle
+ * (Escalate, Mark Resolved). Returns the updated ticket on success, or
+ * null on any failure — the caller decides how to surface that, same
+ * pattern as the other functions here.
+ */
+export async function updateTicketStatus(
+  id: number,
+  status: TicketStatus
+): Promise<Ticket | null> {
+  if (USE_MOCK) {
+    await delay(300);
+    const match = MOCK_TICKETS.find((t) => t.id === id);
+    return match ? { ...match, status } : null;
+  }
+  try {
+    const res = await request(`/ticket/${id}/status`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status }),
+    });
+    if (!res.ok) return null;
+    const body = (await res.json()) as { data?: Ticket };
+    return body.data ?? null;
+  } catch {
+    return null;
   }
 }
 
