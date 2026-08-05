@@ -1,7 +1,11 @@
 import { useEffect, useId, useState } from "react";
 import type { Ticket, TicketStatus } from "../types/ticket";
 import { categoryLabel, levelLabel } from "../lib/labels";
-import { submitFeedback, updateTicketStatus } from "../lib/api";
+import {
+  getTicketFeedback,
+  submitFeedback,
+  updateTicketStatus,
+} from "../lib/api";
 import PriorityMatrix from "./PriorityMatrix";
 
 /**
@@ -68,8 +72,14 @@ export default function ResultView({ ticket, mode, onTicketChange }: ResultViewP
       {isAgent ? (
         <>
           <CalculatedZone ticket={liveTicket} />
-          <StatusActions ticket={liveTicket} onStatusChange={handleStatusChange} />
-          {grounded && <ReplyEditor ticket={liveTicket} />}
+          <StatusActions
+            ticket={liveTicket}
+            grounded={grounded}
+            onStatusChange={handleStatusChange}
+          />
+          {grounded && (
+            <ReplyEditor ticket={liveTicket} onStatusChange={handleStatusChange} />
+          )}
           <FeedbackForm ticketId={liveTicket.id} />
         </>
       ) : (
@@ -210,15 +220,22 @@ function Cell({
  * ungrounded ticket still needs to be escalated to a human), while
  * ReplyEditor's actions only make sense when there's a drafted reply.
  *
+ * The generic "Mark resolved" action only shows for ungrounded tickets.
+ * A grounded ticket has a reply to send, and ReplyEditor's "Send reply" is
+ * the intended path to Resolved for those — showing both would just be two
+ * buttons doing almost the same thing.
+ *
  * Closed is intentionally not exposed here — a minimal, forward-only
  * Open -> In Progress -> Resolved flow is what the product needs today;
  * adding a fourth step is trivial later but isn't needed yet.
  */
 function StatusActions({
   ticket,
+  grounded,
   onStatusChange,
 }: {
   ticket: Ticket;
+  grounded: boolean;
   onStatusChange: (ticket: Ticket) => void;
 }) {
   const [busy, setBusy] = useState(false);
@@ -247,7 +264,7 @@ function StatusActions({
         </button>
       )}
 
-      {ticket.status === "In Progress" && (
+      {ticket.status === "In Progress" && !grounded && (
         <button
           className="btn ghost"
           type="button"
@@ -267,18 +284,29 @@ function StatusActions({
 
 /* -------------------------------------------------------------------------- */
 
-function ReplyEditor({ ticket }: { ticket: Ticket }) {
+function ReplyEditor({
+  ticket,
+  onStatusChange,
+}: {
+  ticket: Ticket;
+  onStatusChange: (ticket: Ticket) => void;
+}) {
   const [draft, setDraft] = useState(ticket.suggested_reply);
   const [copied, setCopied] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [sendFailed, setSendFailed] = useState(false);
   const id = useId();
 
   // A new ticket must reset the editor, or the previous draft leaks into it.
   useEffect(() => {
     setDraft(ticket.suggested_reply);
     setCopied(false);
+    setSending(false);
+    setSendFailed(false);
   }, [ticket.id, ticket.suggested_reply]);
 
   const edited = draft !== ticket.suggested_reply;
+  const alreadySent = ticket.status === "Resolved" || ticket.status === "Closed";
 
   async function copy() {
     try {
@@ -288,6 +316,16 @@ function ReplyEditor({ ticket }: { ticket: Ticket }) {
     } catch {
       setCopied(false);
     }
+  }
+
+  async function sendReply() {
+    if (sending || alreadySent) return;
+    setSending(true);
+    setSendFailed(false);
+    const updated = await updateTicketStatus(ticket.id, "Resolved", draft);
+    setSending(false);
+    if (updated) onStatusChange(updated);
+    else setSendFailed(true);
   }
 
   return (
@@ -303,21 +341,37 @@ function ReplyEditor({ ticket }: { ticket: Ticket }) {
         id={id}
         className="f tall"
         value={draft}
+        disabled={alreadySent}
         onChange={(e) => setDraft(e.target.value)}
       />
       <div className="f-foot">
-        <button className="btn" type="button" onClick={copy}>
+        <button className="btn ghost" type="button" onClick={copy}>
           {copied ? "Copied" : "Copy reply"}
         </button>
         <button
           className="btn ghost"
           type="button"
-          disabled={!edited}
+          disabled={!edited || alreadySent}
           onClick={() => setDraft(ticket.suggested_reply)}
         >
           Revert to suggested reply
         </button>
       </div>
+
+      {alreadySent ? (
+        <p className="sent" role="status">
+          Reply sent successfully (simulated). Ticket marked {ticket.status}.
+        </p>
+      ) : (
+        <div className="f-foot">
+          <button className="btn" type="button" disabled={sending} onClick={sendReply}>
+            {sending ? "Sending…" : "Send reply"}
+          </button>
+          {sendFailed && (
+            <span className="field-err">Couldn&rsquo;t send. Try again.</span>
+          )}
+        </div>
+      )}
     </div>
   );
 }
@@ -332,21 +386,47 @@ function FeedbackForm({ ticketId }: { ticketId: number }) {
   const [sent, setSent] = useState(false);
   const [sending, setSending] = useState(false);
   const [failed, setFailed] = useState(false);
+  const [checking, setChecking] = useState(true);
+  const [existingComment, setExistingComment] = useState("");
   const id = useId();
 
+  // Re-check for existing feedback whenever the ticket changes, so
+  // reopening an already-rated ticket shows what was submitted instead of
+  // silently offering a blank form again.
   useEffect(() => {
     setRating(null);
     setComment("");
     setSent(false);
     setSending(false);
     setFailed(false);
+    setChecking(true);
+    setExistingComment("");
+
+    let cancelled = false;
+    getTicketFeedback(ticketId).then((existing) => {
+      if (cancelled) return;
+      setChecking(false);
+      if (existing) {
+        setRating(existing.rating);
+        setExistingComment(existing.comment);
+        setSent(true);
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
   }, [ticketId]);
+
+  if (checking) {
+    return <p className="quiet">Checking for existing feedback…</p>;
+  }
 
   if (sent) {
     return (
       <p className="sent" role="status">
-        Feedback recorded. Thanks — it tells the knowledge team which
-        documentation is working.
+        Feedback recorded — rated {rating}/5
+        {existingComment && <>: &ldquo;{existingComment}&rdquo;</>}. Thanks —
+        it tells the knowledge team which documentation is working.
       </p>
     );
   }
@@ -355,14 +435,19 @@ function FeedbackForm({ ticketId }: { ticketId: number }) {
     if (rating === null || sending) return;
     setSending(true);
     setFailed(false);
+    const trimmedComment = comment.trim();
     const ok = await submitFeedback({
       ticket_id: ticketId,
       rating,
-      comment: comment.trim() || undefined,
+      comment: trimmedComment || undefined,
     });
     setSending(false);
-    if (ok) setSent(true);
-    else setFailed(true);
+    if (ok) {
+      setExistingComment(trimmedComment);
+      setSent(true);
+    } else {
+      setFailed(true);
+    }
   }
 
   return (

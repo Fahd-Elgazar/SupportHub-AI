@@ -62,6 +62,15 @@ export interface FeedbackRequest {
   comment?: string;
 }
 
+/** A feedback row as returned by GET /ticket/:id/feedback. */
+export interface Feedback {
+  id: number;
+  ticket_id: number;
+  rating: 1 | 2 | 3 | 4 | 5;
+  comment: string;
+  created_at?: string;
+}
+
 /* -------------------------------------------------------------------------- */
 /* Response envelopes                                                          */
 /* -------------------------------------------------------------------------- */

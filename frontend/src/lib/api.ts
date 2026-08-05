@@ -1,5 +1,6 @@
 import type {
   ApiError,
+  Feedback,
   FeedbackRequest,
   RequestState,
   Ticket,
@@ -151,28 +152,53 @@ export async function submitFeedback(input: FeedbackRequest): Promise<boolean> {
 
 /**
  * PATCH /ticket/:id/status — moves a ticket through its lifecycle
- * (Escalate, Mark Resolved). Returns the updated ticket on success, or
- * null on any failure — the caller decides how to surface that, same
- * pattern as the other functions here.
+ * (Escalate, Mark Resolved, Send Reply). `reply` is optional and only
+ * sent by "Send Reply", which saves the edited reply alongside the status
+ * change. Returns the updated ticket on success, or null on any failure —
+ * the caller decides how to surface that, same pattern as the other
+ * functions here.
  */
 export async function updateTicketStatus(
   id: number,
-  status: TicketStatus
+  status: TicketStatus,
+  reply?: string
 ): Promise<Ticket | null> {
   if (USE_MOCK) {
     await delay(300);
     const match = MOCK_TICKETS.find((t) => t.id === id);
-    return match ? { ...match, status } : null;
+    if (!match) return null;
+    return { ...match, status, ...(reply !== undefined ? { suggested_reply: reply } : {}) };
   }
   try {
     const res = await request(`/ticket/${id}/status`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status }),
+      body: JSON.stringify(reply !== undefined ? { status, reply } : { status }),
     });
     if (!res.ok) return null;
     const body = (await res.json()) as { data?: Ticket };
     return body.data ?? null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * GET /ticket/:id/feedback — the most recent feedback already recorded
+ * for this ticket, or null if there is none (or the check failed). Used
+ * to preload the feedback form so re-opening an already-rated ticket
+ * shows what was submitted instead of a blank form.
+ */
+export async function getTicketFeedback(ticketId: number): Promise<Feedback | null> {
+  if (USE_MOCK) {
+    await delay(200);
+    return null;
+  }
+  try {
+    const res = await request(`/ticket/${ticketId}/feedback`, { method: "GET" });
+    if (!res.ok) return null;
+    const body = (await res.json()) as { data?: Feedback[] };
+    return body.data?.[0] ?? null;
   } catch {
     return null;
   }

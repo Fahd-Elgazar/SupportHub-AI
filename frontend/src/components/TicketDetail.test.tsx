@@ -7,6 +7,8 @@ import type { Ticket } from "../types/ticket";
 vi.mock("../lib/api", () => ({
   getTicket: vi.fn(),
   submitFeedback: vi.fn(),
+  updateTicketStatus: vi.fn(),
+  getTicketFeedback: vi.fn().mockResolvedValue(null),
 }));
 
 const TICKET: Ticket = {
