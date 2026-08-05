@@ -95,7 +95,44 @@ Content-Type: application/json
 }
 ```
 
-## 3. Health check
+## 3. Update ticket status
+
+```http
+PATCH /api/supporthub-ai/ticket/:id/status
+Content-Type: application/json
+```
+
+```json
+{
+  "status": "In Progress"
+}
+```
+
+`status` must be one of `Open`, `In Progress`, `Resolved`, `Closed`. This endpoint only changes the ticket's status column — it does not touch any other field. Used by the agent workspace (Ticket Detail) to move a ticket through its lifecycle, and by the "Escalate" action (which sets `In Progress`).
+
+### Success response — 200
+
+```json
+{
+  "success": true,
+  "message": "Ticket status updated.",
+  "data": {
+    "id": 1,
+    "...": "...full ticket row, with the new status..."
+  }
+}
+```
+
+### Not found — 404
+
+```json
+{
+  "success": false,
+  "message": "Ticket not found."
+}
+```
+
+## 4. Health check
 
 ```http
 GET /api/supporthub-ai/health
@@ -111,7 +148,7 @@ GET /api/supporthub-ai/health
 }
 ```
 
-## 4. Version information
+## 5. Version information
 
 ```http
 GET /api/supporthub-ai/version
@@ -130,7 +167,7 @@ GET /api/supporthub-ai/version
 
 The provider value depends on environment configuration.
 
-## 5. Validate request only
+## 6. Validate request only
 
 ```http
 GET /api/supporthub-ai/validate
@@ -147,7 +184,7 @@ This is a `GET` route, not `POST`. It takes no body and does not read the reques
 }
 ```
 
-## 6. Unknown route
+## 7. Unknown route
 
 ### Response — 404
 

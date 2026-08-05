@@ -77,6 +77,38 @@ describe("SupportHub API", () => {
 
     });
 
+    describe("PATCH Ticket Status", () => {
+
+        test("should update ticket status", async () => {
+
+            const response = await request(app)
+                .patch("/api/supporthub-ai/ticket/1/status")
+                .send({
+
+                    status:"In Progress"
+
+                });
+
+            expect([200,404]).toContain(response.statusCode);
+
+        });
+
+        test("should reject invalid status", async () => {
+
+            const response = await request(app)
+                .patch("/api/supporthub-ai/ticket/1/status")
+                .send({
+
+                    status:"Not A Real Status"
+
+                });
+
+            expect(response.statusCode).toBe(400);
+
+        });
+
+    });
+
     describe("POST Feedback", () => {
 
         test("should save feedback", async () => {

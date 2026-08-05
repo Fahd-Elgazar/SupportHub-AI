@@ -93,6 +93,36 @@ exports.getTicketById = async (req, res, next) => {
 
 /*
 |--------------------------------------------------------------------------
+| Update Ticket Status
+|--------------------------------------------------------------------------
+*/
+
+exports.updateTicketStatus = async (req, res, next) => {
+  try {
+    const ticket = await ticketModel.updateTicketStatus(
+      req.params.id,
+      req.body.status
+    );
+
+    if (!ticket) {
+      return res.status(404).json({
+        success: false,
+        message: "Ticket not found.",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Ticket status updated.",
+      data: ticket,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/*
+|--------------------------------------------------------------------------
 | Get All Feedback
 |--------------------------------------------------------------------------
 */

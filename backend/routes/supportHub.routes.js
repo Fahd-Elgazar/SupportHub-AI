@@ -8,6 +8,7 @@ const validate = require("../middleware/validate");
 
 const supportRequestSchema = require("../schemas/supportRequest.schema");
 const feedbackSchema = require("../schemas/feedback.schema");
+const statusUpdateSchema = require("../schemas/statusUpdate.schema");
 
 /*
 |--------------------------------------------------------------------------
@@ -47,6 +48,12 @@ router.get(
 router.get(
   "/ticket/:id",
   controller.getTicketById
+);
+
+router.patch(
+  "/ticket/:id/status",
+  validate(statusUpdateSchema),
+  controller.updateTicketStatus
 );
 
 /*
