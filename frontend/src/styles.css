@@ -68,7 +68,7 @@ body {
   background-attachment: fixed;
   color: var(--ink);
   font-family: var(--body);
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1.55;
   -webkit-font-smoothing: antialiased;
   position: relative;
@@ -93,9 +93,9 @@ h1, h2, h3 {
   line-height: 1.2;
   letter-spacing: -0.018em;
 }
-h1 { font-size: 32px; }
-h2 { font-size: 21px; }
-h3 { font-size: 15px; }
+h1 { font-size: 30px; }
+h2 { font-size: 23px; }
+h3 { font-size: 16px; }
 
 .sr-only {
   position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
@@ -135,57 +135,60 @@ h3 { font-size: 15px; }
 
 .wrap {
   flex: 1 0 auto;
-  width: 100%; max-width: 1360px; margin: 0 auto; padding: 20px 32px;
+  width: 100%; max-width: 1600px; margin: 0 auto; padding: 20px 40px;
   display: flex; flex-direction: column; gap: 16px;
 }
 
 /* A single content block — Ask result, Ticket detail, Queue all render
    inside one of these. Replaces the old single page-wide card so the
-   Ask page's two-column layout and hero can sit outside it. */
+   Ask page's two-column layout and hero can sit outside it. Generous
+   horizontal padding, modest vertical — the card should hug its content
+   top-to-bottom, not pad it out. */
 .card {
   background: var(--card); border: 1px solid var(--line);
   border-radius: var(--radius-lg); box-shadow: var(--shadow-sm);
-  padding: 32px 36px;
+  padding: 30px 48px;
 }
 @media (max-width: 640px) {
-  .card { padding: 24px 18px; }
+  .card { padding: 24px 20px; }
 }
 
 .foot {
   flex: none;
-  text-align: center; color: var(--slate); font-size: 12px;
-  padding: 16px 24px 20px;
+  text-align: center; color: var(--slate); font-size: 13px;
+  padding: 18px 24px 22px;
 }
 .foot p { margin: 0; }
 .foot p.foot-name {
   font-family: var(--display); font-weight: 700; color: var(--ink);
-  font-size: 14px; letter-spacing: -0.01em; margin-bottom: 6px;
+  font-size: 15px; letter-spacing: -0.01em; margin-bottom: 6px;
 }
-.foot p.foot-desc { max-width: 46ch; margin: 0 auto 10px; line-height: 1.5; }
-.foot p.foot-copy { font-family: var(--mono); font-size: 11.5px; }
+.foot p.foot-desc { max-width: 72ch; margin: 0 auto 10px; line-height: 1.5; }
+.foot p.foot-copy { font-family: var(--mono); font-size: 12px; }
 
 /* ---------- hero ---------- */
 
-/* Compact banner, not a landing-page hero — branding stays visible without
-   costing more vertical space than the form it introduces. */
-.hero { flex: none; padding: 2px 2px 0; }
+/* A banner, not a landing-page hero — real type, but still one compact
+   block above the form rather than a full marketing section. */
+.hero { flex: none; padding: 4px 2px 0; }
 .hero-eyebrow {
-  display: flex; align-items: center; gap: 6px; color: var(--brand);
-  font-family: var(--mono); font-size: 10.5px; font-weight: 600;
-  letter-spacing: 0.07em; text-transform: uppercase; margin-bottom: 4px;
+  display: flex; align-items: center; gap: 7px; color: var(--brand);
+  font-family: var(--mono); font-size: 12px; font-weight: 600;
+  letter-spacing: 0.07em; text-transform: uppercase; margin-bottom: 6px;
 }
-.hero h1 { font-size: 21px; margin-bottom: 4px; }
+.hero h1 { font-size: 30px; margin-bottom: 6px; }
 .hero h1 .accent { color: var(--brand); }
-.hero p { color: var(--slate); font-size: 13px; line-height: 1.5; max-width: 62ch; margin: 0 0 10px; }
-.hero-pills { display: flex; gap: 8px; flex-wrap: wrap; }
+.hero p { color: var(--slate); font-size: 15px; line-height: 1.5; max-width: 68ch; margin: 0 0 12px; }
+.hero-pills { display: flex; gap: 10px; flex-wrap: wrap; }
 .badge.b-brand { background: var(--brand-tint); color: var(--brand); }
 
 /* ---------- ask page: two-column layout ---------- */
 
 /* align-items: start (not stretch) so the form card wraps its own content
-   instead of stretching down to match whatever height the sidebar needs. */
-.ask-columns { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 24px; align-items: start; }
-@media (max-width: 960px) {
+   instead of stretching down to match whatever height the sidebar needs.
+   7:3 split — the form is the workspace, the sidebar is a helper rail. */
+.ask-columns { display: grid; grid-template-columns: minmax(0, 7fr) minmax(340px, 3fr); gap: 28px; align-items: start; }
+@media (max-width: 1100px) {
   .ask-columns { grid-template-columns: 1fr; }
 }
 
@@ -193,59 +196,63 @@ h3 { font-size: 15px; }
    and slightly deeper shadow set it apart from the form beside it. Sticky
    so it stays in view while a long ticket result scrolls past it. */
 .ask-info {
-  display: flex; flex-direction: column; gap: 12px; padding: 20px 24px;
+  display: flex; flex-direction: column; gap: 20px; padding: 28px 30px;
   background: var(--paper); box-shadow: var(--shadow-md);
-  position: sticky; top: 88px;
+  position: sticky; top: 96px;
 }
-@media (max-width: 960px) {
+@media (max-width: 1100px) {
   .ask-info { position: static; }
 }
 .ask-info h3 {
-  display: flex; align-items: center; gap: 7px;
-  margin-bottom: 2px; font-size: 12.5px;
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 4px; font-size: 14.5px;
 }
-.ask-info .section-desc { color: var(--slate); font-size: 11px; line-height: 1.35; margin: 0 0 6px; }
+.ask-info .section-desc { color: var(--slate); font-size: 12.5px; line-height: 1.4; margin: 0 0 8px; }
 .ask-info-icon { color: var(--brand); flex: none; }
 
-.cap-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
-.cap-list li { display: flex; align-items: flex-start; gap: 8px; font-size: 12px; line-height: 1.35; color: var(--ink); }
+.cap-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.cap-list li { display: flex; align-items: flex-start; gap: 10px; font-size: 13px; line-height: 1.4; color: var(--ink); }
 .cap-list li span {
   display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
 }
 .cap-icon {
   flex: none; color: var(--brand); background: var(--brand-tint);
-  border-radius: var(--radius-sm); padding: 4px; margin-top: 1px;
+  border-radius: var(--radius-sm); padding: 5px; margin-top: 1px;
 }
 
-.example-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 5px; }
+.example-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
 .example-row {
   display: flex; align-items: center; gap: 10px; justify-content: space-between;
-  font-size: 12px; line-height: 1.4; color: var(--slate); background: #fff;
-  border-radius: var(--radius-sm); padding: 8px 8px 8px 11px;
+  font-size: 12.5px; line-height: 1.4; color: var(--slate); background: #fff;
+  border-radius: var(--radius-sm); padding: 10px 10px 10px 13px;
 }
 .example-row span {
   flex: 1; min-width: 0; display: -webkit-box; -webkit-line-clamp: 2;
   -webkit-box-orient: vertical; overflow: hidden;
 }
 
-.btn.sm { padding: 6px 12px; min-height: 32px; font-size: 12px; width: auto; flex: none; }
+.btn.sm { padding: 7px 13px; min-height: 34px; font-size: 12.5px; width: auto; flex: none; }
 
 /* ---------- ask page: what happens after you submit ---------- */
-
-.triage-steps {
-  display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
-  margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--line-soft);
+/* Proper tiles, not a thin icon+text row — they should read as feature
+   cards that use the workspace's width, not a caption under the form. */
+.triage-tiles {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px;
+  margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--line-soft);
 }
-@media (max-width: 560px) {
-  .triage-steps { grid-template-columns: 1fr; }
+@media (max-width: 640px) {
+  .triage-tiles { grid-template-columns: 1fr; }
 }
-.triage-step { display: flex; gap: 9px; align-items: center; }
-.triage-step-icon {
-  flex: none; color: var(--brand); background: var(--brand-tint);
-  border-radius: var(--radius-sm); padding: 6px;
+.triage-tile {
+  background: var(--paper); border: 1px solid var(--line-soft);
+  border-radius: var(--radius-md); padding: 18px 20px;
 }
-.triage-step-title { font-weight: 600; font-size: 12.5px; margin: 0 0 1px; }
-.triage-step-desc { color: var(--slate); font-size: 11px; line-height: 1.3; margin: 0; }
+.triage-tile-icon {
+  display: inline-flex; color: var(--brand); background: var(--brand-tint);
+  border-radius: var(--radius-sm); padding: 9px; margin-bottom: 12px;
+}
+.triage-tile-title { font-weight: 600; font-size: 14.5px; margin: 0 0 5px; }
+.triage-tile-desc { color: var(--slate); font-size: 12.5px; line-height: 1.45; margin: 0; }
 
 /* ---------- splash ---------- */
 
@@ -259,17 +266,17 @@ h3 { font-size: 15px; }
 
 /* ---------- form ---------- */
 
-label.f, legend.f { display: block; font-weight: 600; font-size: 13.5px; margin-bottom: 8px; padding: 0; }
-.hint { color: var(--slate); font-size: 12.5px; line-height: 1.5; margin: 0 0 11px; }
+label.f, legend.f { display: block; font-weight: 600; font-size: 15px; margin-bottom: 9px; padding: 0; }
+.hint { color: var(--slate); font-size: 13.5px; line-height: 1.5; margin: 0 0 12px; }
 
 textarea.f, input.f {
-  width: 100%; font: inherit; padding: 13px 14px;
+  width: 100%; font: inherit; padding: 16px 18px;
   border: 1.5px solid var(--line-strong); border-radius: var(--radius-sm);
   background: #fff; color: var(--ink); resize: vertical;
   transition: border-color var(--ease), box-shadow var(--ease);
 }
-textarea.f { min-height: 88px; }
-textarea.f.tall { min-height: 132px; }
+textarea.f { min-height: 168px; }
+textarea.f.tall { min-height: 220px; }
 textarea.f:hover:not(:disabled), input.f:hover:not(:disabled) { border-color: var(--slate); }
 textarea.f:focus, input.f:focus {
   outline: 2px solid var(--signal); outline-offset: 1px; border-color: var(--signal);
@@ -277,14 +284,14 @@ textarea.f:focus, input.f:focus {
 textarea.f:disabled { background: var(--paper); color: var(--slate); }
 textarea.f.invalid { border-color: var(--p1); }
 
-.f-foot { display: flex; align-items: center; gap: 14px; margin-top: 14px; flex-wrap: wrap; }
-.count { font-family: var(--mono); font-size: 12px; color: var(--slate); margin-left: auto; }
+.f-foot { display: flex; align-items: center; gap: 16px; margin-top: 16px; flex-wrap: wrap; }
+.count { font-family: var(--mono); font-size: 13px; color: var(--slate); margin-left: auto; }
 .count.bad { color: var(--p1); font-weight: 500; }
 .count.push { margin-left: auto; }
 
 .btn {
-  font: inherit; font-weight: 600; font-size: 13.5px;
-  padding: 10px 22px; border-radius: var(--radius-sm); min-height: 44px;
+  font: inherit; font-weight: 600; font-size: 14.5px;
+  padding: 12px 26px; border-radius: var(--radius-sm); min-height: 48px;
   border: 1.5px solid var(--ink); background: var(--ink); color: #fff; cursor: pointer;
   box-shadow: var(--shadow-xs);
   transition: background-color var(--ease), border-color var(--ease),
@@ -301,10 +308,10 @@ textarea.f.invalid { border-color: var(--p1); }
 
 fieldset { border: 0; padding: 0; margin: 0 0 18px; }
 
-.chips { display: flex; gap: 9px; flex-wrap: wrap; }
+.chips { display: flex; gap: 10px; flex-wrap: wrap; }
 .chip {
-  font: inherit; font-size: 13px; min-width: 44px; min-height: 44px;
-  padding: 6px 14px; border: 1px solid var(--line-strong); border-radius: var(--radius-sm);
+  font: inherit; font-size: 14px; min-width: 46px; min-height: 46px;
+  padding: 7px 15px; border: 1px solid var(--line-strong); border-radius: var(--radius-sm);
   background: #fff; color: var(--slate); cursor: pointer;
   transition: background-color var(--ease), border-color var(--ease), color var(--ease);
 }
@@ -318,11 +325,10 @@ fieldset { border: 0; padding: 0; margin: 0 0 18px; }
   display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
   margin: 40px 0 16px; padding-top: 30px; border-top: 1px solid var(--line-soft);
 }
-.result-head h2 { font-size: 21px; }
 .asked {
   background: var(--paper); border-left: 3px solid var(--line-strong);
-  border-radius: var(--radius-sm); color: var(--ink); font-size: 13.5px;
-  line-height: 1.6; margin: 0 0 30px; padding: 12px 16px;
+  border-radius: var(--radius-sm); color: var(--ink); font-size: 14.5px;
+  line-height: 1.6; margin: 0 0 30px; padding: 14px 18px;
 }
 
 .zone {
@@ -331,7 +337,7 @@ fieldset { border: 0; padding: 0; margin: 0 0 18px; }
 }
 .zone:first-of-type { margin-top: 0; }
 .zone-tag {
-  font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.13em;
+  font-family: var(--mono); font-size: 11.5px; letter-spacing: 0.12em;
   text-transform: uppercase; display: flex; align-items: center; gap: 8px;
   margin-bottom: 17px; font-weight: 600;
 }
@@ -368,8 +374,8 @@ fieldset { border: 0; padding: 0; margin: 0 0 18px; }
   font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.09em;
   text-transform: uppercase; color: var(--slate); margin-bottom: 5px;
 }
-.kv .v, .kv dd { font-family: var(--display); font-size: 15px; font-weight: 500; margin: 0; }
-.kv .v.big { font-size: 26px; font-weight: 700; letter-spacing: -0.01em; }
+.kv .v, .kv dd { font-family: var(--display); font-size: 16px; font-weight: 500; margin: 0; }
+.kv .v.big { font-size: 28px; font-weight: 700; letter-spacing: -0.01em; }
 .kv .v.p-p1 { color: var(--p1); }
 .kv .v.p-p2 { color: var(--p2); }
 .kv .v.p-p3 { color: var(--p3); }
@@ -385,28 +391,28 @@ fieldset { border: 0; padding: 0; margin: 0 0 18px; }
   .stats-grid { grid-template-columns: repeat(2, 1fr); }
 }
 .stat-card {
-  display: flex; align-items: center; gap: 12px; background: var(--paper);
+  display: flex; align-items: center; gap: 14px; background: var(--paper);
   border: 1px solid var(--line-soft); border-radius: var(--radius-md);
-  padding: 16px 18px;
+  padding: 18px 20px;
 }
 .stat-icon {
   flex: none; color: var(--brand); background: var(--brand-tint);
-  border-radius: var(--radius-sm); padding: 8px;
+  border-radius: var(--radius-sm); padding: 9px;
 }
-.stat-value { font-family: var(--display); font-size: 22px; font-weight: 700; margin: 0; line-height: 1.1; }
-.stat-label { color: var(--slate); font-size: 11.5px; margin: 3px 0 0; }
+.stat-value { font-family: var(--display); font-size: 26px; font-weight: 700; margin: 0; line-height: 1.1; }
+.stat-label { color: var(--slate); font-size: 12.5px; margin: 3px 0 0; }
 
 .queue-filters { display: flex; gap: 32px; flex-wrap: wrap; margin: 20px 0 26px; }
 
 .queue-list { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line-soft); }
 .queue-row {
   display: grid;
-  grid-template-columns: 74px 1fr 54px 100px minmax(170px, 260px);
-  gap: 16px;
+  grid-template-columns: 80px 1fr 58px 108px minmax(180px, 280px);
+  gap: 18px;
   align-items: center;
-  padding: 16px 8px;
+  padding: 17px 10px;
   border-bottom: 1px solid var(--line-soft);
-  font-size: 13px;
+  font-size: 14px;
 }
 button.queue-row {
   width: 100%; font: inherit; color: inherit; text-align: left;
@@ -423,8 +429,8 @@ button.queue-row:focus-visible { outline: 2px solid var(--signal); outline-offse
 
 .badge {
   display: inline-flex; align-items: center; gap: 6px;
-  font-family: var(--mono); font-size: 11.5px; font-weight: 600;
-  padding: 5px 11px; border-radius: 999px; letter-spacing: 0.03em;
+  font-family: var(--mono); font-size: 12.5px; font-weight: 600;
+  padding: 6px 12px; border-radius: 999px; letter-spacing: 0.03em;
 }
 .badge.b-p1 { background: var(--p1-t); color: var(--p1); }
 .badge.b-p2 { background: var(--p2-t); color: var(--p2); }
