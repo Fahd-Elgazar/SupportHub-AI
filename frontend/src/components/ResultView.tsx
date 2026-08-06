@@ -8,6 +8,7 @@ import {
   UserCog,
   MessageSquareHeart,
   Loader2,
+  CheckCircle2,
 } from "lucide-react";
 import type { Ticket, TicketStatus } from "../types/ticket";
 import { categoryLabel, levelLabel } from "../lib/labels";
@@ -264,15 +265,23 @@ function StatusActions({
 }) {
   const [busy, setBusy] = useState(false);
   const [failed, setFailed] = useState(false);
+  /** Set only after a transition this session actually succeeds — a
+   *  confirmation of the action just taken, not a permanent status readout
+   *  (the badge in the header already covers that on every future view). */
+  const [confirmation, setConfirmation] = useState<string | null>(null);
 
-  async function transition(status: TicketStatus) {
+  async function transition(status: TicketStatus, confirmMessage: string) {
     if (busy) return;
     setBusy(true);
     setFailed(false);
     const updated = await updateTicketStatus(ticket.id, status);
     setBusy(false);
-    if (updated) onStatusChange(updated);
-    else setFailed(true);
+    if (updated) {
+      setConfirmation(confirmMessage);
+      onStatusChange(updated);
+    } else {
+      setFailed(true);
+    }
   }
 
   return (
@@ -282,7 +291,12 @@ function StatusActions({
           className="btn ghost"
           type="button"
           disabled={busy}
-          onClick={() => transition("In Progress")}
+          onClick={() =>
+            transition(
+              "In Progress",
+              `Escalated to ${ticket.escalation_team}. Status changed to In Progress.`
+            )
+          }
         >
           {busy ? "Escalating…" : `Escalate to ${ticket.escalation_team}`}
         </button>
@@ -293,10 +307,23 @@ function StatusActions({
           className="btn ghost"
           type="button"
           disabled={busy}
-          onClick={() => transition("Resolved")}
+          onClick={() => transition("Resolved", "Ticket marked resolved.")}
         >
           {busy ? "Updating…" : "Mark resolved"}
         </button>
+      )}
+
+      {confirmation && (
+        <motion.span
+          className="status-confirm"
+          role="status"
+          initial={{ opacity: 0, y: 4 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.25, ease: "easeOut" }}
+        >
+          <CheckCircle2 size={15} aria-hidden="true" />
+          {confirmation}
+        </motion.span>
       )}
 
       {failed && (

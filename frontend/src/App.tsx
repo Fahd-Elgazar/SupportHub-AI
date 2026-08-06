@@ -51,34 +51,36 @@ export default function App() {
       </a>
 
       <header className="appbar">
-        <div className="mark">
-          <img src={logo} alt="SupportHub AI" className="mark-logo" />
+        <div className="appbar-inner">
+          <div className="mark">
+            <img src={logo} alt="SupportHub AI" className="mark-logo" />
+          </div>
+          <nav className="nav" aria-label="Main">
+            <a
+              href="#main"
+              className={activeView === "ask" ? "on" : undefined}
+              aria-current={activeView === "ask" ? "page" : undefined}
+              onClick={() => {
+                setActiveView("ask");
+                setSelectedTicketId(null);
+              }}
+            >
+              Ask
+            </a>
+            <a
+              href="#main"
+              className={activeView === "queue" ? "on" : undefined}
+              aria-current={activeView === "queue" ? "page" : undefined}
+              onClick={() => {
+                setActiveView("queue");
+                setSelectedTicketId(null);
+              }}
+            >
+              Queue
+            </a>
+          </nav>
+          {usingMockData && <span className="who">Mock data · no server</span>}
         </div>
-        <nav className="nav" aria-label="Main">
-          <a
-            href="#main"
-            className={activeView === "ask" ? "on" : undefined}
-            aria-current={activeView === "ask" ? "page" : undefined}
-            onClick={() => {
-              setActiveView("ask");
-              setSelectedTicketId(null);
-            }}
-          >
-            Ask
-          </a>
-          <a
-            href="#main"
-            className={activeView === "queue" ? "on" : undefined}
-            aria-current={activeView === "queue" ? "page" : undefined}
-            onClick={() => {
-              setActiveView("queue");
-              setSelectedTicketId(null);
-            }}
-          >
-            Queue
-          </a>
-        </nav>
-        {usingMockData && <span className="who">Mock data · no server</span>}
       </header>
 
       <main id="main" className="wrap">

@@ -22,25 +22,37 @@
   --gen-edge: #cfc4e8;
   --gen-ink: #4a3a7a;
 
-  --p1: #b92f2f; --p1-t: #fbe9e9;
-  --p2: #a15a11; --p2-t: #fbf0e2;
-  --p3: #2a5da6; --p3-t: #e7eef9;
-  --p4: #626d7a; --p4-t: #edf0f3;
-
   /* brand accent — matches the logo's blue; ~5:1 on white, passes AA for
-     normal text. Used sparingly: chrome/headings/icons, never inside the
-     zone-tag colour system (that palette stays meaningful on its own). */
+     normal text. Used both for chrome (nav/icons/headings) and as P3's
+     priority colour — one blue across the app instead of two near-identical
+     ones drifting apart over time. */
   --brand: #2563eb;
   --brand-tint: #eaf1fe;
   --brand-edge: #c9dcfb;
+
+  --p1: #b92f2f; --p1-t: #fbe9e9;
+  --p2: #a15a11; --p2-t: #fbf0e2;
+  --p3: var(--brand); --p3-t: var(--brand-tint);
+  --p4: #626d7a; --p4-t: #edf0f3;
+
+  /* spacing rhythm — cards, sections and forms pull from this scale rather
+     than one-off pixel values, so gaps read as deliberate, not random. */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 32px;
+  --space-8: 40px;
+  --space-9: 48px;
 
   --display: "Space Grotesk", system-ui, sans-serif;
   --body: "IBM Plex Sans", system-ui, sans-serif;
   --mono: "IBM Plex Mono", ui-monospace, monospace;
 
-  /* visual-polish pass: spacing/radius/shadow/motion only — no color values
-     added or changed here, since every existing color is contrast-audited
-     in docs/accessibility-checklist.md */
+  /* radius/shadow/motion tokens. Colour changes here should stay within the
+     contrast ratios documented in docs/accessibility-checklist.md. */
   --radius-sm: 6px;
   --radius-md: 8px;
   --radius-lg: 12px;
@@ -112,9 +124,16 @@ h3 { font-size: 16px; }
 
 .appbar {
   flex: none;
-  display: flex; align-items: center; gap: 14px;
-  padding: 12px 24px; background: #fff; border-bottom: 1px solid var(--line);
+  padding: 12px 0; background: #fff; border-bottom: 1px solid var(--line);
   box-shadow: var(--shadow-xs);
+}
+/* The bar spans the window edge-to-edge (like real app chrome), but its
+   content aligns to the same width and side margins as the cards below it,
+   instead of sitting flush at the window edge while the page content is
+   centred in a narrower column. */
+.appbar-inner {
+  width: 100%; max-width: 1760px; margin: 0 auto; padding: 0 32px;
+  display: flex; align-items: center; gap: 14px;
 }
 .mark { display: flex; align-items: center; }
 .mark-logo {
@@ -135,8 +154,8 @@ h3 { font-size: 16px; }
 
 .wrap {
   flex: 1 0 auto;
-  width: 100%; max-width: 1600px; margin: 0 auto; padding: 20px 40px;
-  display: flex; flex-direction: column; gap: 16px;
+  width: 100%; max-width: 1760px; margin: 0 auto; padding: var(--space-5) var(--space-7);
+  display: flex; flex-direction: column; gap: var(--space-4);
 }
 
 /* A single content block — Ask result, Ticket detail, Queue all render
@@ -147,10 +166,10 @@ h3 { font-size: 16px; }
 .card {
   background: var(--card); border: 1px solid var(--line);
   border-radius: var(--radius-lg); box-shadow: var(--shadow-sm);
-  padding: 30px 48px;
+  padding: var(--space-7) var(--space-9);
 }
 @media (max-width: 640px) {
-  .card { padding: 24px 20px; }
+  .card { padding: var(--space-6) var(--space-4); }
 }
 
 .foot {
@@ -184,10 +203,12 @@ h3 { font-size: 16px; }
 
 /* ---------- ask page: two-column layout ---------- */
 
-/* align-items: start (not stretch) so the form card wraps its own content
-   instead of stretching down to match whatever height the sidebar needs.
-   7:3 split — the form is the workspace, the sidebar is a helper rail. */
-.ask-columns { display: grid; grid-template-columns: minmax(0, 7fr) minmax(340px, 3fr); gap: 28px; align-items: start; }
+/* The sidebar is a fixed-width helper rail (like Notion/Linear's side
+   panels), not a proportional column — so on a wide monitor, the extra
+   width goes entirely to the workspace instead of both columns growing
+   together. align-items: start so the form card wraps its own content
+   instead of stretching down to match whatever height the sidebar needs. */
+.ask-columns { display: grid; grid-template-columns: minmax(0, 1fr) minmax(320px, 380px); gap: var(--space-7); align-items: start; }
 @media (max-width: 1100px) {
   .ask-columns { grid-template-columns: 1fr; }
 }
@@ -348,9 +369,9 @@ fieldset { border: 0; padding: 0; margin: 0 0 18px; }
 .z-gen p { margin: 0 0 10px; line-height: 1.65; }
 .z-gen p:last-child { margin-bottom: 0; }
 
-.z-src { background: #fff; border: 1px solid var(--ink); }
+.z-src { background: #fff; border: 1px solid var(--line-strong); }
 .z-src .zone-tag { color: var(--ink); }
-.z-src.empty-src { border-style: dashed; box-shadow: none; }
+.z-src.empty-src { border-style: dashed; border-color: var(--line); box-shadow: none; }
 
 .z-calc { background: var(--signal-tint); border: 1px solid var(--signal-edge); }
 .z-calc .zone-tag { color: var(--signal); }
@@ -402,7 +423,14 @@ fieldset { border: 0; padding: 0; margin: 0 0 18px; }
 .stat-value { font-family: var(--display); font-size: 26px; font-weight: 700; margin: 0; line-height: 1.1; }
 .stat-label { color: var(--slate); font-size: 12.5px; margin: 3px 0 0; }
 
-.queue-filters { display: flex; gap: 32px; flex-wrap: wrap; margin: 20px 0 26px; }
+/* A toolbar strip, not two loose fieldsets floating in the page — reads as
+   one filter bar the way a dashboard's would. */
+.queue-filters {
+  display: flex; gap: var(--space-8); flex-wrap: wrap;
+  margin: var(--space-6) 0 var(--space-6); padding: var(--space-4) var(--space-5);
+  background: var(--paper); border: 1px solid var(--line-soft); border-radius: var(--radius-md);
+}
+.queue-filters fieldset { margin: 0; }
 
 .queue-list { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line-soft); }
 .queue-row {
@@ -410,20 +438,21 @@ fieldset { border: 0; padding: 0; margin: 0 0 18px; }
   grid-template-columns: 80px 1fr 58px 108px minmax(180px, 280px);
   gap: 18px;
   align-items: center;
-  padding: 17px 10px;
+  padding: 18px 14px;
   border-bottom: 1px solid var(--line-soft);
   font-size: 14px;
+  border-radius: var(--radius-sm);
 }
 button.queue-row {
   width: 100%; font: inherit; color: inherit; text-align: left;
   background: none; border: none; border-bottom: 1px solid var(--line-soft);
   cursor: pointer; transition: background-color var(--ease), box-shadow var(--ease);
 }
-button.queue-row:hover { background: var(--paper); box-shadow: inset 3px 0 0 var(--signal); }
+button.queue-row:hover { background: var(--paper); box-shadow: inset 3px 0 0 var(--brand); }
 button.queue-row:focus-visible { outline: 2px solid var(--signal); outline-offset: -2px; }
 .qc-id { font-family: var(--mono); font-size: 11.5px; color: var(--slate); }
 .qc-q { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 500; }
-.qc-meta { color: var(--slate); font-size: 12px; text-align: right; }
+.qc-meta { color: var(--slate); font-size: 12.5px; text-align: right; }
 
 /* ---------- badges: colour never carries meaning alone ---------- */
 
@@ -460,7 +489,7 @@ button.queue-row:focus-visible { outline: 2px solid var(--signal); outline-offse
 .matrix td.on { color: #fff; font-weight: 600; }
 .matrix td.on.p-p1 { background: var(--p1); border-color: var(--p1); box-shadow: 0 0 0 3px rgba(185, 47, 47, 0.18); }
 .matrix td.on.p-p2 { background: var(--p2); border-color: var(--p2); box-shadow: 0 0 0 3px rgba(168, 94, 18, 0.18); }
-.matrix td.on.p-p3 { background: var(--p3); border-color: var(--p3); box-shadow: 0 0 0 3px rgba(42, 93, 166, 0.18); }
+.matrix td.on.p-p3 { background: var(--p3); border-color: var(--p3); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.18); }
 .matrix td.on.p-p4 { background: var(--p4); border-color: var(--p4); box-shadow: 0 0 0 3px rgba(101, 113, 126, 0.18); }
 
 .matrix-read { font-size: 13px; line-height: 1.55; max-width: 34ch; }
@@ -480,7 +509,7 @@ button.queue-row:focus-visible { outline: 2px solid var(--signal); outline-offse
 /* ---------- section grouping ---------- */
 
 .section-block {
-  margin-top: 40px; padding-top: 28px; border-top: 1px solid var(--line-soft);
+  margin-top: var(--space-8); padding-top: var(--space-6); border-top: 1px solid var(--line-soft);
 }
 .section-label {
   font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.13em;
@@ -491,6 +520,10 @@ button.queue-row:focus-visible { outline: 2px solid var(--signal); outline-offse
 
 .status-actions {
   margin-top: 0; display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+}
+.status-confirm {
+  display: inline-flex; align-items: center; gap: 6px;
+  color: var(--signal); font-size: 13.5px; font-weight: 500;
 }
 .reply { margin-top: 28px; }
 .sent {
@@ -556,9 +589,10 @@ button.queue-row:focus-visible { outline: 2px solid var(--signal); outline-offse
 }
 
 @media (max-width: 640px) {
-  .appbar { padding: 10px 16px; gap: 10px; }
+  .appbar { padding: 10px 0; }
+  .appbar-inner { padding: 0 16px; gap: 10px; }
   .mark-logo { height: 35px; }
-  .wrap { padding: 28px 18px 60px; }
+  .wrap { padding: var(--space-6) var(--space-4); }
   .zone { padding: 18px; }
   .btn { width: 100%; }
   .count { margin-left: 0; }

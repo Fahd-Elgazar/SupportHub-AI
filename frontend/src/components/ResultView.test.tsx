@@ -66,6 +66,10 @@ describe("ResultView — agent mode", () => {
     // once there's a reply to send instead — "Send reply" is the path.
     expect(screen.queryByRole("button", { name: /mark resolved/i })).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: /send reply/i })).toBeInTheDocument();
+    // The status change is no longer silent — a confirmation names the team and new status.
+    expect(
+      screen.getByText(/escalated to billing team\. status changed to in progress/i)
+    ).toBeInTheDocument();
   });
 
   it("shows the generic Mark resolved action for an ungrounded ticket instead", async () => {

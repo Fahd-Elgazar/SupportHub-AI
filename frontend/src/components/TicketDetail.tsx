@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { AlertTriangle } from "lucide-react";
 import type { Ticket } from "../types/ticket";
 import { getTicket } from "../lib/api";
 import { LoadingState } from "./States";
@@ -63,7 +64,7 @@ export default function TicketDetail({
       {state.kind === "error" && (
         <section role="alert">
           <div className="alert err">
-            <span className="ic">!</span>
+            <AlertTriangle size={18} className="ic" aria-hidden="true" />
             <div>
               <strong>Could not load this ticket.</strong>
               {state.message}
