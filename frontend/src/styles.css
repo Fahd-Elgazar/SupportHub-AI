@@ -155,7 +155,7 @@ h3 { font-size: 16px; }
 .wrap {
   flex: 1 0 auto;
   width: 100%; max-width: 1760px; margin: 0 auto; padding: var(--space-5) var(--space-7);
-  display: flex; flex-direction: column; gap: var(--space-4);
+  display: flex; flex-direction: column; gap: var(--space-3);
 }
 
 /* A single content block — Ask result, Ticket detail, Queue all render
@@ -166,7 +166,7 @@ h3 { font-size: 16px; }
 .card {
   background: var(--card); border: 1px solid var(--line);
   border-radius: var(--radius-lg); box-shadow: var(--shadow-sm);
-  padding: var(--space-7) var(--space-9);
+  padding: var(--space-6) var(--space-9);
 }
 @media (max-width: 640px) {
   .card { padding: var(--space-6) var(--space-4); }
@@ -188,17 +188,19 @@ h3 { font-size: 16px; }
 /* ---------- hero ---------- */
 
 /* A banner, not a landing-page hero — real type, but still one compact
-   block above the form rather than a full marketing section. */
-.hero { flex: none; padding: 4px 2px 0; }
+   block above the form rather than a full marketing section. Trimmed
+   further so the form (the actual workspace) is visible immediately,
+   not after scrolling past branding. */
+.hero { flex: none; padding: 0 2px; }
 .hero-eyebrow {
-  display: flex; align-items: center; gap: 7px; color: var(--brand);
-  font-family: var(--mono); font-size: 12px; font-weight: 600;
-  letter-spacing: 0.07em; text-transform: uppercase; margin-bottom: 6px;
+  display: flex; align-items: center; gap: 6px; color: var(--brand);
+  font-family: var(--mono); font-size: 11.5px; font-weight: 600;
+  letter-spacing: 0.07em; text-transform: uppercase; margin-bottom: 4px;
 }
-.hero h1 { font-size: 30px; margin-bottom: 6px; }
+.hero h1 { font-size: 25px; margin-bottom: 4px; }
 .hero h1 .accent { color: var(--brand); }
-.hero p { color: var(--slate); font-size: 15px; line-height: 1.5; max-width: 68ch; margin: 0 0 12px; }
-.hero-pills { display: flex; gap: 10px; flex-wrap: wrap; }
+.hero p { color: var(--slate); font-size: 14px; line-height: 1.45; max-width: 68ch; margin: 0 0 10px; }
+.hero-pills { display: flex; gap: 8px; flex-wrap: wrap; }
 .badge.b-brand { background: var(--brand-tint); color: var(--brand); }
 
 /* ---------- ask page: two-column layout ---------- */
@@ -206,20 +208,23 @@ h3 { font-size: 16px; }
 /* The sidebar is a fixed-width helper rail (like Notion/Linear's side
    panels), not a proportional column — so on a wide monitor, the extra
    width goes entirely to the workspace instead of both columns growing
-   together. align-items: start so the form card wraps its own content
-   instead of stretching down to match whatever height the sidebar needs. */
-.ask-columns { display: grid; grid-template-columns: minmax(0, 1fr) minmax(320px, 380px); gap: var(--space-7); align-items: start; }
+   together. Narrower than before: it's a secondary reference panel, the
+   workspace is the point. align-items: start so the form card wraps its
+   own content instead of stretching down to match the sidebar's height. */
+.ask-columns { display: grid; grid-template-columns: minmax(0, 1fr) minmax(300px, 344px); gap: var(--space-6); align-items: start; }
 @media (max-width: 1100px) {
   .ask-columns { grid-template-columns: 1fr; }
 }
 
 /* Visually a sidebar, not a second copy of the main card — a soft tint
    and slightly deeper shadow set it apart from the form beside it. Sticky
-   so it stays in view while a long ticket result scrolls past it. */
+   so it stays in view while a long ticket result scrolls past it. Tighter
+   container spacing than the main card (it's secondary), but the type
+   inside stays a normal reading size — smaller padding, not smaller text. */
 .ask-info {
-  display: flex; flex-direction: column; gap: 20px; padding: 28px 30px;
+  display: flex; flex-direction: column; gap: 16px; padding: 22px 24px;
   background: var(--paper); box-shadow: var(--shadow-md);
-  position: sticky; top: 96px;
+  position: sticky; top: 88px;
 }
 @media (max-width: 1100px) {
   .ask-info { position: static; }
@@ -228,11 +233,11 @@ h3 { font-size: 16px; }
   display: flex; align-items: center; gap: 8px;
   margin-bottom: 4px; font-size: 14.5px;
 }
-.ask-info .section-desc { color: var(--slate); font-size: 12.5px; line-height: 1.4; margin: 0 0 8px; }
+.ask-info .section-desc { color: var(--slate); font-size: 12.5px; line-height: 1.4; margin: 0 0 6px; }
 .ask-info-icon { color: var(--brand); flex: none; }
 
-.cap-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
-.cap-list li { display: flex; align-items: flex-start; gap: 10px; font-size: 13px; line-height: 1.4; color: var(--ink); }
+.cap-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 9px; }
+.cap-list li { display: flex; align-items: flex-start; gap: 9px; font-size: 13.5px; line-height: 1.4; color: var(--ink); }
 .cap-list li span {
   display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
 }
@@ -241,11 +246,11 @@ h3 { font-size: 16px; }
   border-radius: var(--radius-sm); padding: 5px; margin-top: 1px;
 }
 
-.example-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.example-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 7px; }
 .example-row {
   display: flex; align-items: center; gap: 10px; justify-content: space-between;
   font-size: 12.5px; line-height: 1.4; color: var(--slate); background: #fff;
-  border-radius: var(--radius-sm); padding: 10px 10px 10px 13px;
+  border-radius: var(--radius-sm); padding: 9px 9px 9px 12px;
 }
 .example-row span {
   flex: 1; min-width: 0; display: -webkit-box; -webkit-line-clamp: 2;
@@ -258,15 +263,15 @@ h3 { font-size: 16px; }
 /* Proper tiles, not a thin icon+text row — they should read as feature
    cards that use the workspace's width, not a caption under the form. */
 .triage-tiles {
-  display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px;
-  margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--line-soft);
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+  margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--line-soft);
 }
 @media (max-width: 640px) {
   .triage-tiles { grid-template-columns: 1fr; }
 }
 .triage-tile {
   background: var(--paper); border: 1px solid var(--line-soft);
-  border-radius: var(--radius-md); padding: 18px 20px;
+  border-radius: var(--radius-md); padding: 16px 18px;
 }
 .triage-tile-icon {
   display: inline-flex; color: var(--brand); background: var(--brand-tint);
@@ -296,8 +301,11 @@ textarea.f, input.f {
   background: #fff; color: var(--ink); resize: vertical;
   transition: border-color var(--ease), box-shadow var(--ease);
 }
-textarea.f { min-height: 168px; }
-textarea.f.tall { min-height: 220px; }
+/* The question/reply textareas are the page's actual workspace — a touch
+   of depth (shadow) gives them more visual weight than a plain bordered
+   box, so the eye lands there first instead of on the surrounding chrome. */
+textarea.f { min-height: 192px; box-shadow: var(--shadow-xs); }
+textarea.f.tall { min-height: 240px; }
 textarea.f:hover:not(:disabled), input.f:hover:not(:disabled) { border-color: var(--slate); }
 textarea.f:focus, input.f:focus {
   outline: 2px solid var(--signal); outline-offset: 1px; border-color: var(--signal);
