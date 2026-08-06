@@ -1,21 +1,9 @@
 import { Tags, Gauge, Route } from "lucide-react";
 
 const STEPS = [
-  {
-    icon: Tags,
-    title: "Classify",
-    desc: "Category, impact and urgency are detected automatically.",
-  },
-  {
-    icon: Gauge,
-    title: "Prioritize",
-    desc: "Impact × urgency maps to a deterministic P1–P4 priority.",
-  },
-  {
-    icon: Route,
-    title: "Route",
-    desc: "Each ticket is escalated to the right team automatically.",
-  },
+  { icon: Tags, title: "Classify", desc: "Category & urgency detected" },
+  { icon: Gauge, title: "Prioritize", desc: "Deterministic P1–P4" },
+  { icon: Route, title: "Route", desc: "Escalated automatically" },
 ];
 
 /** Fills the quiet space below the form with a one-glance summary of what happens next. */

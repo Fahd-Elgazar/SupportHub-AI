@@ -10,29 +10,16 @@ import {
 } from "lucide-react";
 
 const CAPABILITIES = [
-  {
-    icon: ShieldCheck,
-    text: "Answers grounded only in approved documentation — never invented",
-  },
-  {
-    icon: Gauge,
-    text: "Impact, urgency, priority and SLA calculated by deterministic rules",
-  },
-  {
-    icon: Route,
-    text: "Automatic ticket categorisation and escalation-team routing",
-  },
-  {
-    icon: FileEdit,
-    text: "A ready-to-edit reply drafted alongside every triage",
-  },
+  { icon: ShieldCheck, text: "Grounded only in approved documentation" },
+  { icon: Gauge, text: "Priority & SLA calculated deterministically" },
+  { icon: Route, text: "Auto-categorised and routed to the right team" },
+  { icon: FileEdit, text: "A ready-to-edit reply drafted every time" },
 ];
 
 const EXAMPLES = [
   "My account got hacked and I can't recover it. The password reset link isn't working.",
   "I paid for the Pro plan yesterday but my account still shows Free.",
   "Everything is down, none of our team can log in at all.",
-  "Where can I download my invoices?",
 ];
 
 /** Right-hand rail on the Ask page: what the tool does, and how to get a good result from it. */
@@ -74,9 +61,8 @@ export default function AskInfoPanel() {
           Getting a good answer
         </h3>
         <p className="hint">
-          Paste the customer&rsquo;s message as close to verbatim as
-          possible. More context (what they&rsquo;ve already tried, what
-          exactly is failing) means a more specific triage and reply.
+          Paste the message close to verbatim, including what&rsquo;s
+          already been tried, for the most specific triage.
         </p>
       </section>
     </aside>
