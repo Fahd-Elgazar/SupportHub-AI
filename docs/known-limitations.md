@@ -2,7 +2,12 @@
 
 ## Grounding limitations
 
-The current prompt asks the model to provide `source: ["Internal Knowledge Base"]`, but the backend does not retrieve or verify approved knowledge documents. Source labels therefore do not prove that an answer was grounded in a specific document.
+The backend loads the three approved knowledge base documents (support policy, product FAQ, troubleshooting guide) directly into the system prompt on every request, and the model is instructed to answer only from that content. This is a real improvement over an earlier version of this document, which described a backend that did not use the knowledge base at all — that statement is no longer accurate.
+
+Within that design, two gaps remain:
+
+- Source labels (e.g. `"Support Policy §4.2"`) identify which approved document the model drew from, but they are not a verifiable retrieval reference — there is no passage-level citation, document ID, or version pinned to the response. The label reflects what the model reports using, not a system-verified trace back to a specific document chunk.
+- For questions outside the scope of the knowledge base, the model correctly declines to invent an answer, but has been observed to still return a generic `source: ["Internal KB"]` label even when it states plainly that the knowledge base does not contain the requested information. The refusal behavior is correct; the source metadata accompanying it is not always a reliable signal of whether grounding actually occurred.
 
 ## Not-found behavior
 
